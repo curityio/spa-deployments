@@ -25,6 +25,10 @@ if [ $? -ne 0 ]; then
 fi
 
 cd token-handler-api
+
+# TODO: delete on merge
+git checkout feature/401-reliability
+
 npm install
 if [ $? -ne 0 ]; then
   echo "Problem encountered installing the Token Handler API dependencies"
