@@ -65,7 +65,7 @@ services:
       SCOPE: 'openid profile'
       COOKIE_DOMAIN: 'api.example.com'
       COOKIE_NAME_PREFIX: 'example'
-      COOKIE_ENCRYPTION_KEY: '4e4636356d65563e4c73233847503e3b21436e6f7629724950526f4b5e2e4e50'
+      COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
     command: >
       sh -c "/usr/lib/jvm/zulu11-ca/bin/keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
              su apiuser &&

@@ -24,6 +24,17 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 #
+# Supply the 32 byte encryption key for AES256 as an environment variable
+#
+export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
+echo -n $ENCRYPTION_KEY > encryption.key
+
+#
+# Update the template file with the encryption key
+#
+envsubst < reverse-proxy/kong.template.yml > ./kong/kong.yml
+
+#
 # Set an environment variable to reference the root CA used for the development setup
 # This is passed through to the Docker Compose file and then to the config_backup.xml file
 #
