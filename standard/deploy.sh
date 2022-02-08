@@ -26,7 +26,7 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 # Update the template file with the encryption key
 #
-envsubst < reverse-proxy/kong.template.yml > ./kong/kong.yml
+envsubst < reverse-proxy/kong.template.yml > ./reverse-proxy/kong.yml
 
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
