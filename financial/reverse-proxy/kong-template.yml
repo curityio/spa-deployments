@@ -28,7 +28,7 @@ services:
   # 1. The OAuth proxy plugin decrypts the secure cookie and forwards the opaque access token to the API endpoint
   - name: oauth-proxy
     config:
-      encryption_key: 4e4636356d65563e4c73233847503e3b21436e6f7629724950526f4b5e2e4e50
+      encryption_key: $ENCRYPTION_KEY
       cookie_name_prefix: example
       trusted_web_origins:
       - https://www.example.com

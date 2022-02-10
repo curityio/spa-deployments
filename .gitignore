@@ -4,3 +4,4 @@ oauth-proxy-plugin
 kong-phantom-token-plugin
 financial/certs/example*
 .DS_Store
+kong.yml

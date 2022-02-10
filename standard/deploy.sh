@@ -18,6 +18,17 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 #
+# Supply the 32 byte encryption key for AES256 as an environment variable
+#
+export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
+echo -n $ENCRYPTION_KEY > encryption.key
+
+#
+# Update the template file with the encryption key
+#
+envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
+
+#
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
 docker compose --project-name spa up --force-recreate --detach --remove-orphans
