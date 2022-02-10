@@ -61,11 +61,6 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# TODO: delete on merge
-cd oauth-proxy-plugin
-git checkout feature/cors-refinements
-cd ..
-
 #
 # Also download the phantom token plugin for the reverse proxy
 #
