@@ -23,6 +23,13 @@ if [ ! -f './idsvr/license.json' ]; then
   exit 1
 fi
 
+# Uncomment when developing in this repo
+# The Identity Server must be on the same domain as the web and API domain, to simplify use of SSL certificates
+#export CERTIFICATE_DOMAIN=customer.com
+#export WEB_DOMAIN=www.customer.com
+#export API_DOMAIN=api.customer.com
+#export IDSVR_DOMAIN=login.customer.com
+
 #
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #
@@ -36,6 +43,18 @@ envsubst < ./spa/config-template.json        > ./spa/config.json
 envsubst < ./webhost/config-template.json    > ./webhost/config.json
 envsubst < ./api/config-template.json        > ./api/config.json
 envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
+envsubst < ./certs/extensions-template.cnf   > ./certs/extensions.cnf
+
+#
+# Generate OpenSSL certificates for development
+#
+cd certs
+#./create-certs.sh
+if [ $? -ne 0 ]; then
+  echo "Problem encountered creating and installing certificates for the Token Handler"
+  exit 1
+fi
+cd ..
 
 #
 # Set an environment variable to reference the root CA used for the development setup

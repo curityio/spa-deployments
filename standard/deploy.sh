@@ -17,6 +17,12 @@ if [ ! -f './idsvr/license.json' ]; then
   exit 1
 fi
 
+# Uncomment when developing in this repo
+# The Identity Server can be on a separate domain to the web and API domain
+#export WEB_DOMAIN=www.customer-internal.com
+#export API_DOMAIN=api.customer-internal.com
+#export IDSVR_DOMAIN=login.customer.com
+
 #
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #

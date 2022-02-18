@@ -15,19 +15,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
-# Generate OpenSSL certificates for development
-#
-if [ ! -f './certs/example.ca.pem' ]; then
-  cd certs
-  ./create-certs.sh
-  if [ $? -ne 0 ]; then
-    echo "Problem encountered creating and installing certificates for the Token Handler"
-    exit 1
-  fi
-  cd ..
-fi
-
-#
 # Get and build the main Token Handler API (aka 'OAuth Agent')
 #
 rm -rf token-handler-api

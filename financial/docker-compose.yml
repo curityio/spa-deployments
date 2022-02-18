@@ -52,18 +52,18 @@ services:
       CLIENT_CERT_P12_PATH: './certs/example.client.p12'
       CLIENT_CERT_P12_PASSWORD: 'Password1'
       CA_CERT_PEM_PATH: './certs/example.ca.pem'
-      TRUSTED_WEB_ORIGIN: 'https://www.example.com'
-      ISSUER: 'https://login.example.com:8443/oauth/v2/oauth-anonymous'
+      TRUSTED_WEB_ORIGIN: "https://${WEB_DOMAIN}"
+      ISSUER: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-anonymous"
       JWKS_URI: 'https://login-internal.example.com:8443/oauth/v2/oauth-anonymous/jwks'
       AUTHORIZE_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-authorize'
-      AUTHORIZE_EXTERNAL_ENDPOINT: 'https://login.example.com:8443/oauth/v2/oauth-authorize'
+      AUTHORIZE_EXTERNAL_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
       TOKEN_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: 'https://login.example.com:8443/oauth/v2/oauth-session/logout'
+      LOGOUT_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout"
       CLIENT_ID: 'spa-client'
-      REDIRECT_URI: 'https://www.example.com/'
-      POST_LOGOUT_REDIRECT_URI: 'https://www.example.com/'
+      REDIRECT_URI: 'https://${WEB_DOMAIN}/'
+      POST_LOGOUT_REDIRECT_URI: 'https://${WEB_DOMAIN}/'
       SCOPE: 'openid profile'
-      COOKIE_DOMAIN: 'api.example.com'
+      COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
     command: >
@@ -131,3 +131,4 @@ services:
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
       IDSVR_DOMAIN: "${IDSVR_DOMAIN}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
+      CERTIFICATE_DOMAIN: "${CERTIFICATE_DOMAIN}"

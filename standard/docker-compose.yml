@@ -38,15 +38,15 @@ services:
       - ./token-handler-api/dist/config.js:/usr/bff-api/dist/config.js
     environment:
       PORT: 3001
-      TRUSTED_WEB_ORIGIN: 'http://www.example.com'
-      AUTHORIZE_ENDPOINT: 'http://login.example.com:8443/oauth/v2/oauth-authorize'
+      TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"
+      AUTHORIZE_ENDPOINT: "http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
       TOKEN_ENDPOINT: 'http://login-internal.example.com:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: 'http://login.example.com:8443/oauth/v2/oauth-session/logout'
+      LOGOUT_ENDPOINT: 'http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout'
       CLIENT_ID: 'spa-client'
-      REDIRECT_URI: 'http://www.example.com/'
-      POST_LOGOUT_REDIRECT_URI: 'http://www.example.com/'
+      REDIRECT_URI: 'http://${WEB_DOMAIN}/'
+      POST_LOGOUT_REDIRECT_URI: 'http://${WEB_DOMAIN}/'
       SCOPE: 'openid profile'
-      COOKIE_DOMAIN: 'api.example.com'
+      COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
 

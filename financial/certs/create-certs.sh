@@ -31,20 +31,20 @@ esac
 #
 TRUSTSTORE_FILE_PREFIX='example.ca'
 TRUSTSTORE_PASSWORD='Password1'
-TRUSTSTORE_NAME='Self Signed CA for example.com'
+TRUSTSTORE_NAME="Self Signed CA for $CERTIFICATE_DOMAIN"
 
 #
 # Server certificate parameters
 #
 SERVER_KEYSTORE_FILE_PREFIX='example.server'
 SERVER_KEYSTORE_PASSWORD='Password1'
-WILDCARD_DOMAIN_NAME='*.example.com'
+WILDCARD_DOMAIN_NAME="*.$CERTIFICATE_DOMAIN"
 
 #
 # Client certificate parameters used for Mutual TLS
 #
 CLIENT_KEYSTORE_FILE_PREFIX='example.client'
-CLIENT_KEYSTORE_NAME='financial-grade-spa, OU=Example, O=Curity AB, C=SE'
+CLIENT_KEYSTORE_NAME="financial-grade-spa, OU=$CERTIFICATE_DOMAIN, O=Curity AB, C=SE"
 CLIENT_KEYSTORE_PASSWORD='Password1'
 
 #
