@@ -129,3 +129,5 @@ services:
     environment:
       PASSWORD: 'Password1'
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
+      IDSVR_DOMAIN: "${IDSVR_DOMAIN}"
+      WEB_DOMAIN: "${WEB_DOMAIN}"

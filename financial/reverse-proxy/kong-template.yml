@@ -28,10 +28,10 @@ services:
   # 1. The OAuth proxy plugin decrypts the secure cookie and forwards the opaque access token to the API endpoint
   - name: oauth-proxy
     config:
-      encryption_key: $ENCRYPTION_KEY
       cookie_name_prefix: example
+      encryption_key: $ENCRYPTION_KEY
       trusted_web_origins:
-      - https://www.example.com
+      - https://$WEB_DOMAIN
       cors_enabled: true
 
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
@@ -42,4 +42,4 @@ services:
       client_secret: Password1
       token_cache_seconds: 900
       trusted_web_origins:
-      - https://www.example.com
+      - https://$WEB_DOMAIN

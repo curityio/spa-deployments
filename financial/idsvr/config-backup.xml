@@ -1,7 +1,7 @@
 <config xmlns="http://tail-f.com/ns/config/1.0">
   <environments xmlns="https://curity.se/ns/conf/base">
     <environment>
-      <base-url>https://login.example.com:8443</base-url>
+      <base-url>https://#{IDSVR_DOMAIN}:8443</base-url>
       <admin-service>
         <http>
           <ssl-server-keystore>default-admin-ssl-key</ssl-server-keystore>
@@ -330,11 +330,11 @@
                   <client-dn>CN="financial-grade-spa, OU=Example, O=Curity AB, C=SE"</client-dn>
                   <trusted-ca>financial_grade_client_ca</trusted-ca>
                 </mutual-tls>
-                <redirect-uris>https://www.example.com/</redirect-uris>
+                <redirect-uris>https://#{WEB_DOMAIN}/</redirect-uris>
                 <scope>openid</scope>
                 <scope>profile</scope>
                 <user-authentication>
-                  <allowed-post-logout-redirect-uris>https://www.example.com/</allowed-post-logout-redirect-uris>
+                  <allowed-post-logout-redirect-uris>https://#{WEB_DOMAIN}/</allowed-post-logout-redirect-uris>
                 </user-authentication>
                 <capabilities>
                   <code>

@@ -9,6 +9,10 @@
 #
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+export WEB_DOMAIN=www.example.com
+export API_DOMAIN=api.example.com
+export IDSVR_DOMAIN=login.example.com
+
 #
 # First check prerequisites
 #
@@ -24,15 +28,12 @@ export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
 
 #
-# Update the template file with the encryption key
+# Update template files with the encryption key and other supplied environment variables
 #
+envsubst < ./spa/config-template.json        > ./spa/config.json
+envsubst < ./webhost/config-template.json    > ./webhost/config.json
+envsubst < ./api/config-template.json        > ./api/config.json
 envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
-
-echo $BASE_DOMAIN
-echo $IDSVR_DOMAIN
-echo $WEB_PREFIX
-echo $API_PREFIX
-exit
 
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration

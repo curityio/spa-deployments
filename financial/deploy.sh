@@ -30,8 +30,11 @@ export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
 
 #
-# Update the template file with the encryption key
+# Update template files with the encryption key and other supplied environment variables
 #
+envsubst < ./spa/config-template.json        > ./spa/config.json
+envsubst < ./webhost/config-template.json    > ./webhost/config.json
+envsubst < ./api/config-template.json        > ./api/config.json
 envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
 
 #

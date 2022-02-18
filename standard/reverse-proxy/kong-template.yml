@@ -31,7 +31,7 @@ services:
       cookie_name_prefix: example
       encryption_key: $ENCRYPTION_KEY
       trusted_web_origins:
-      - http://www.example.com
+      - http://$WEB_DOMAIN
       cors_enabled: true
   
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
@@ -42,5 +42,4 @@ services:
       client_secret: Password1
       token_cache_seconds: 900
       trusted_web_origins:
-      - http://www.example.com
-
+      - http://$WEB_DOMAIN
