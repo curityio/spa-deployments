@@ -7,3 +7,4 @@ financial/certs/extensions.cnf
 .DS_Store
 kong.yml
 config.json
+encryption.key
