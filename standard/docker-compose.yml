@@ -17,7 +17,7 @@ services:
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
-  # It runs on port 3002 inside the cluster at http://api.example-internal.com:3002
+  # It runs on port 3002 inside the cluster at http://api.internal-example.com:3002
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/api
   #
   business-api:
@@ -28,7 +28,7 @@ services:
 
   #
   # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at http://tokenhandler.example-internal.com:3001
+  # It runs on port 3001 inside the cluster at http://tokenhandler.internal-example.com:3001
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/tokenhandler
   #
   token-handler-api:
