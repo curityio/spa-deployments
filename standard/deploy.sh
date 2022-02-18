@@ -9,10 +9,6 @@
 #
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-export WEB_DOMAIN=www.example.com
-export API_DOMAIN=api.example.com
-export IDSVR_DOMAIN=login.example.com
-
 #
 # First check prerequisites
 #
