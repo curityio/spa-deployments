@@ -1,6 +1,6 @@
 {
     "port": 3000,
-    "apiBaseUrl": "http://api.sab-internal.com:3000",
+    "apiBaseUrl": "http://api.mycompany.com:3000",
     "keystoreFilePath": "",
     "keystorePassword": ""
 }

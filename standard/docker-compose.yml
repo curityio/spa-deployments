@@ -17,30 +17,30 @@ services:
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
-  # It runs on port 3002 inside the cluster at http://api-internal.example.com:3002
+  # It runs on port 3002 inside the cluster at http://api.example-internal.com:3002
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/api
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api-internal.example.com
+    hostname: api.${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
 
   #
   # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at http://tokenhandler-internal.example.com:3001
+  # It runs on port 3001 inside the cluster at http://tokenhandler.example-internal.com:3001
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/tokenhandler
   #
   token-handler-api:
     image: token-handler-standard:1.0.0
-    hostname: tokenhandler-internal.example.com
+    hostname: tokenhandler.${INTERNAL_DOMAIN}
     volumes:
       - ./token-handler-api/dist/config.js:/usr/bff-api/dist/config.js
     environment:
       PORT: 3001
       TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"
       AUTHORIZE_ENDPOINT: "http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'http://login-internal.example.com:8443/oauth/v2/oauth-token'
+      TOKEN_ENDPOINT: 'http://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
       LOGOUT_ENDPOINT: 'http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout'
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'http://${WEB_DOMAIN}/'
@@ -90,7 +90,7 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login-internal.example.com
+    hostname: login.${INTERNAL_DOMAIN}
     ports:
      - 6749:6749
      - 8443:8443

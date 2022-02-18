@@ -1,7 +1,7 @@
 [ server_ext ]
 basicConstraints = CA:FALSE
 keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName=DNS:sab.com,DNS:www.sab.com,DNS:api.sab.com,DNS:login.sab.com,DNS:api-internal.example.com,DNS:tokenhandler-internal.example.com,DNS:login-internal.example.com
+subjectAltName=DNS:mycompany.com,DNS:www.mycompany.com,DNS:api.mycompany.com,DNS:login.mycompany.com,DNS:api.internal-mycompany.com,DNS:tokenhandler.internal-mycompany.com,DNS:login.internal-mycompany.com
 extendedKeyUsage = serverAuth
 
 [ client_ext ]

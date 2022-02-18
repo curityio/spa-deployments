@@ -18,13 +18,13 @@ services:
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
-  # It runs on port 3002 inside the cluster at https://api-internal.example.com:3002
+  # It runs on port 3002 inside the cluster at https://api.example-internal.com:3002
   # The SPA accesses it via the reverse proxy at https://api.example.com:3000/api
   # The API calls the Authorization Server's JWKS endpoint inside the cluster
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api-internal.example.com
+    hostname: api.${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
@@ -34,13 +34,13 @@ services:
 
   #
   # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at https://tokenhandler-internal.example.com:3001
+  # It runs on port 3001 inside the cluster at https://tokenhandler.example-internal.com:3001
   # The SPA accesses it via the reverse proxy at https://api.example.com:3000/tokenhandler
   # The Token Handler API calls the Authorization Server's token endpoint inside the cluster
   #
   token-handler-api:
     image: token-handler-financial:1.0.0
-    hostname: tokenhandler-internal.example.com
+    hostname: tokenhandler.${INTERNAL_DOMAIN}
     volumes:
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
       - ./certs/example.client.p12:/usr/api/certs/example.client.p12
@@ -54,10 +54,10 @@ services:
       CA_CERT_PEM_PATH: './certs/example.ca.pem'
       TRUSTED_WEB_ORIGIN: "https://${WEB_DOMAIN}"
       ISSUER: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-anonymous"
-      JWKS_URI: 'https://login-internal.example.com:8443/oauth/v2/oauth-anonymous/jwks'
-      AUTHORIZE_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-authorize'
+      JWKS_URI: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-anonymous/jwks'
+      AUTHORIZE_ENDPOINT: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-authorize'
       AUTHORIZE_EXTERNAL_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-token'
+      TOKEN_ENDPOINT: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
       LOGOUT_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout"
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'https://${WEB_DOMAIN}/'
@@ -118,7 +118,7 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login-internal.example.com
+    hostname: login.${INTERNAL_DOMAIN}
     ports:
      - 6749:6749
      - 8443:8443
@@ -131,4 +131,4 @@ services:
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
       IDSVR_DOMAIN: "${IDSVR_DOMAIN}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
-      CERTIFICATE_DOMAIN: "${CERTIFICATE_DOMAIN}"
+      BASE_DOMAIN: "${BASE_DOMAIN}"

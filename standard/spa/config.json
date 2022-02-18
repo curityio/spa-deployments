@@ -1,6 +1,6 @@
 {
-    "businessApiBaseUrl": "http://api.sab-internal.com:3000/api",
+    "businessApiBaseUrl": "http://api.mycompany.com:3000/api",
     "oauth": {
-        "tokenHandlerBaseUrl": "http://api.sab-internal.com:3000/tokenhandler"
+        "tokenHandlerBaseUrl": "http://api.mycompany.com:3000/tokenhandler"
     }
 }

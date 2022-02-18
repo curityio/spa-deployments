@@ -18,16 +18,35 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 # Uncomment when developing in this repo
-# The Identity Server can be on a separate domain to the web and API domain
-#export WEB_DOMAIN=www.customer-internal.com
-#export API_DOMAIN=api.customer-internal.com
-#export IDSVR_DOMAIN=login.customer.com
+# The Identity Server can be on a separate domain to the base domain
+#BASE_DOMAIN='myproduct.com'
+#WEB_SUBDOMAIN='www'
+#API_SUBDOMAIN='api'
+#IDSVR_DOMAIN='login.mycompany.com'
+
+# Calculated values
+WEB_DOMAIN=$BASE_DOMAIN
+if [ "$WEB_SUBDOMAIN" != "" ]; then
+  WEB_DOMAIN="$WEB_SUBDOMAIN.$BASE_DOMAIN"
+fi
+API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
+INTERNAL_DOMAIN="internal-$BASE_DOMAIN"
 
 #
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #
-export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
+ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
+
+#
+# Export variables needed for substitution
+#
+export BASE_DOMAIN
+export WEB_DOMAIN
+export API_DOMAIN
+export IDSVR_DOMAIN
+export INTERNAL_DOMAIN
+export ENCRYPTION_KEY
 
 #
 # Update template files with the encryption key and other supplied environment variables
