@@ -28,6 +28,12 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
 
+echo $BASE_DOMAIN
+echo $IDSVR_DOMAIN
+echo $WEB_PREFIX
+echo $API_PREFIX
+exit
+
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
