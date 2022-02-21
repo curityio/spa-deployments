@@ -8,3 +8,4 @@ financial/certs/extensions.cnf
 kong.yml
 config.json
 encryption.key
+metadata.json

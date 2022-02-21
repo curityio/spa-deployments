@@ -26,8 +26,8 @@ API_SUBDOMAIN='api'
 IDSVR_SUBDOMAIN='login'
 EXTERNAL_IDSVR_BASE_URL=
 EXTERNAL_IDSVR_METADATA_PATH=
-#export EXTERNAL_IDSVR_BASE_URL='https://idsvr.external.com'
-#export EXTERNAL_IDSVR_METADATA_PATH='/oauth/v2/oauth-anonymous/.well-known/openid-configuration'
+#EXTERNAL_IDSVR_BASE_URL='https://idsvr.external.com'
+#EXTERNAL_IDSVR_METADATA_PATH='/oauth/v2/oauth-anonymous/.well-known/openid-configuration'
 
 #
 # Set default domain details
@@ -40,24 +40,45 @@ API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
 INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 
 #
-# Support using an external identity provider, which must be preconfigured
+# Get OAuth related values as environment variables
 #
 if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_METADATA_PATH" != "" ]; then
 
+  # Point to an external identity provider if required
   IDSVR_BASE_URL=$EXTERNAL_IDSVR_BASE_URL
   IDSVR_INTERNAL_BASE_URL=$EXTERNAL_IDSVR_BASE_URL
   DEPLOYMENT_PROFILE='WITHOUT_IDSVR'
 
+  # Get the data
+  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_BASE_URL/$EXTERNAL_IDSVR_METADATA_PATH" \
+    -o metadata.json -w '%{http_code}')
+  if [ "$HTTP_STATUS" != '200' ]; then
+    echo "Problem encountered downloading metadata from external Identity Server: $HTTP_STATUS"
+    exit 1
+  fi
+
+  # Read endpoints
+  METADATA=$(cat metadata.json)
+  AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
+  TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
+  INTROSPECTION_ENDPOINT=$(jq -r .introspection_endpoint <<< "$METADATA")
+  JWKS_ENDPOINT=$(jq -r .jwks_uri <<< "$METADATA")
+  LOGOUT_ENDPOINT=$(jq -r .end_session_endpoint <<< "$METADATA")
+
 else
 
+  # Deploy a Docker based identity server
   IDSVR_BASE_URL="http://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
   IDSVR_INTERNAL_BASE_URL="http://login-$INTERNAL_DOMAIN:8443"
   DEPLOYMENT_PROFILE='WITH_IDSVR'
+  
+  # Use Docker standard endpoints
+  AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
+  TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"
+  INTROSPECTION_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-introspect"
+  JWKS_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-anonymous/jwks"
+  LOGOUT_ENDPOINT="${IDSVR_BASE_URL}/oauth/v2/oauth-session/logout"
 fi
-
-# 1. Retest scenarios
-# 2. Get Docker compose not running IDSVR
-# 3. Produce OAuth URLs from metadata
 
 #
 # Supply the 32 byte encryption key for AES256 as an environment variable
@@ -74,6 +95,11 @@ export API_DOMAIN
 export INTERNAL_DOMAIN
 export IDSVR_BASE_URL
 export IDSVR_INTERNAL_BASE_URL
+export AUTHORIZE_ENDPOINT
+export TOKEN_ENDPOINT
+export INTROSPECTION_ENDPOINT
+export JWKS_ENDPOINT
+export LOGOUT_ENDPOINT
 export ENCRYPTION_KEY
 
 #
@@ -87,7 +113,8 @@ envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
-docker compose --project-name spa up --force-recreate --detach --remove-orphans
+docker compose --project-name spa down
+docker compose --profile $DEPLOYMENT_PROFILE --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1

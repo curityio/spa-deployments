@@ -106,6 +106,8 @@ services:
   curity-data:
     image: postgres:13.2
     hostname: dbserver
+    profiles:
+      - WITH_IDSVR
     volumes:
       - ./idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
     environment:
@@ -120,12 +122,14 @@ services:
     image: curity.azurecr.io/curity/idsvr:6.7.0
     hostname: login-${INTERNAL_DOMAIN}
     ports:
-     - 6749:6749
-     - 8443:8443
+      - 6749:6749
+      - 8443:8443
+    profiles:
+      - WITH_IDSVR
     volumes:
-     - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
-     - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
-     - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
+      - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
+      - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
+      - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
     environment:
       PASSWORD: 'Password1'
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
