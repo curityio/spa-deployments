@@ -24,16 +24,20 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 #
-# Uncomment if developing in this repo and running its build script directly
+# Basic sanity checks
 #
-BASE_DOMAIN='example.com'
-WEB_SUBDOMAIN='www'
-API_SUBDOMAIN='api'
-IDSVR_SUBDOMAIN='login'
-EXTERNAL_IDSVR_BASE_URL=
-EXTERNAL_IDSVR_METADATA_PATH=
-#EXTERNAL_IDSVR_BASE_URL='https://idsvr.external.com'
-#EXTERNAL_IDSVR_METADATA_PATH='/oauth/v2/oauth-anonymous/.well-known/openid-configuration'
+if [ "$BASE_DOMAIN" == "" ]; then
+  echo "No BASE_DOMAIN environment variable was supplied"
+  exit 1
+fi
+if [ "$API_SUBDOMAIN" == "" ]; then
+  echo "No API_SUBDOMAIN environment variable was supplied"
+  exit 1
+fi
+if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_BASE_URL" == "" ]; then
+  echo "No IDSVR_SUBDOMAIN environment variable was supplied"
+  exit 1
+fi
 
 #
 # Set default domain details
