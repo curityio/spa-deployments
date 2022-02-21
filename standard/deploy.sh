@@ -71,7 +71,7 @@ else
   IDSVR_BASE_URL="http://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
   IDSVR_INTERNAL_BASE_URL="http://login-$INTERNAL_DOMAIN:8443"
   DEPLOYMENT_PROFILE='WITH_IDSVR'
-  
+
   # Use Docker standard endpoints
   AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
   TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"

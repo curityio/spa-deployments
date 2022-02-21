@@ -66,6 +66,7 @@ if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_METADATA_PATH" != 
 
   # Read endpoints
   METADATA=$(cat metadata.json)
+  ISSUER_URI="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
   AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
   AUTHORIZE_EXTERNAL_ENDPOINT=$AUTHORIZE_ENDPOINT
   TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
@@ -81,8 +82,8 @@ else
   DEPLOYMENT_PROFILE='WITH_IDSVR'
 
   # Use Docker standard endpoints
-  ISSUER="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
-  AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
+  ISSUER_URI="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
+  AUTHORIZE_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-authorize"
   AUTHORIZE_EXTERNAL_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
   TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"
   INTROSPECTION_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-introspect"
@@ -106,6 +107,13 @@ export IDSVR_DOMAIN
 export INTERNAL_DOMAIN
 export IDSVR_BASE_URL
 export IDSVR_INTERNAL_BASE_URL
+export ISSUER_URI
+export AUTHORIZE_ENDPOINT
+export AUTHORIZE_EXTERNAL_ENDPOINT
+export TOKEN_ENDPOINT
+export INTROSPECTION_ENDPOINT
+export JWKS_ENDPOINT
+export LOGOUT_ENDPOINT
 export ENCRYPTION_KEY
 
 #

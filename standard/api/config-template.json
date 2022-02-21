@@ -1,6 +1,6 @@
 {
     "port": 3002,
-    "jwksUrl": "$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-anonymous/jwks",
+    "jwksUrl": "$JWKS_ENDPOINT",
     "keystoreFilePath": "",
     "keystorePassword": ""
 }

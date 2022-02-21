@@ -37,7 +37,7 @@ services:
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
   - name: phantom-token
     config:
-      introspection_endpoint: $IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-introspect
+      introspection_endpoint: $INTROSPECTION_ENDPOINT
       client_id: api-gateway-client
       client_secret: Password1
       token_cache_seconds: 900
