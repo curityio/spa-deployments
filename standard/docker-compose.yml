@@ -39,9 +39,9 @@ services:
     environment:
       PORT: 3001
       TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"
-      AUTHORIZE_ENDPOINT: "http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'http://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: 'http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout'
+      AUTHORIZE_ENDPOINT: "${IDSVR_BASE_URL}/oauth/v2/oauth-authorize"
+      TOKEN_ENDPOINT: '${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-token'
+      LOGOUT_ENDPOINT: '${IDSVR_BASE_URL}/oauth/v2/oauth-session/logout'
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'http://${WEB_DOMAIN}/'
       POST_LOGOUT_REDIRECT_URI: 'http://${WEB_DOMAIN}/'
@@ -100,5 +100,5 @@ services:
      - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
     environment:
       PASSWORD: 'Password1'
-      IDSVR_DOMAIN: "${IDSVR_DOMAIN}"
+      IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"

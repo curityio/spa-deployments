@@ -53,12 +53,12 @@ services:
       CLIENT_CERT_P12_PASSWORD: 'Password1'
       CA_CERT_PEM_PATH: './certs/example.ca.pem'
       TRUSTED_WEB_ORIGIN: "https://${WEB_DOMAIN}"
-      ISSUER: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-anonymous"
-      JWKS_URI: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-anonymous/jwks'
-      AUTHORIZE_ENDPOINT: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-authorize'
-      AUTHORIZE_EXTERNAL_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout"
+      ISSUER: "${IDSVR_BASE_URL}/oauth/v2/oauth-anonymous"
+      JWKS_URI: '${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-anonymous/jwks'
+      AUTHORIZE_ENDPOINT: '${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-authorize'
+      AUTHORIZE_EXTERNAL_ENDPOINT: "${IDSVR_BASE_URL}/oauth/v2/oauth-authorize"
+      TOKEN_ENDPOINT: '${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-token'
+      LOGOUT_ENDPOINT: "${IDSVR_BASE_URL}/oauth/v2/oauth-session/logout"
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'https://${WEB_DOMAIN}/'
       POST_LOGOUT_REDIRECT_URI: 'https://${WEB_DOMAIN}/'
@@ -129,6 +129,6 @@ services:
     environment:
       PASSWORD: 'Password1'
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
-      IDSVR_DOMAIN: "${IDSVR_DOMAIN}"
+      IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
       BASE_DOMAIN: "${BASE_DOMAIN}"
