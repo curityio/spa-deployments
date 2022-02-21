@@ -24,7 +24,7 @@ services:
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api.${INTERNAL_DOMAIN}
+    hostname: api-${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
@@ -40,7 +40,7 @@ services:
   #
   token-handler-api:
     image: token-handler-financial:1.0.0
-    hostname: tokenhandler.${INTERNAL_DOMAIN}
+    hostname: tokenhandler-${INTERNAL_DOMAIN}
     volumes:
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
       - ./certs/example.client.p12:/usr/api/certs/example.client.p12
@@ -54,10 +54,10 @@ services:
       CA_CERT_PEM_PATH: './certs/example.ca.pem'
       TRUSTED_WEB_ORIGIN: "https://${WEB_DOMAIN}"
       ISSUER: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-anonymous"
-      JWKS_URI: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-anonymous/jwks'
-      AUTHORIZE_ENDPOINT: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-authorize'
+      JWKS_URI: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-anonymous/jwks'
+      AUTHORIZE_ENDPOINT: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-authorize'
       AUTHORIZE_EXTERNAL_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'https://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
+      TOKEN_ENDPOINT: 'https://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
       LOGOUT_ENDPOINT: "https://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout"
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'https://${WEB_DOMAIN}/'
@@ -118,7 +118,7 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login.${INTERNAL_DOMAIN}
+    hostname: login-${INTERNAL_DOMAIN}
     ports:
      - 6749:6749
      - 8443:8443

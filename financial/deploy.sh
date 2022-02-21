@@ -23,13 +23,15 @@ if [ ! -f './idsvr/license.json' ]; then
   exit 1
 fi
 
-# Uncomment when developing in this repo
-# Currently the Identity Server must be on the same base domain as the web and API domain
-# This simplifies use of certificates, with only a single wildcard certificate needed
-#BASE_DOMAIN='mycompany.com'
-#WEB_SUBDOMAIN='www'
-#API_SUBDOMAIN='api'
-#IDSVR_DOMAIN='login.mycompany.com'
+#
+# Uncomment if developing in this repo and running its build script directly
+#
+export BASE_DOMAIN='example.com'
+export WEB_SUBDOMAIN='www'
+export API_SUBDOMAIN='api'
+export IDSVR_SUBDOMAIN='login'
+export EXTERNAL_IDSVR_DOMAIN=
+export EXTERNAL_IDSVR_METADATA_PATH=
 
 # Calculated values
 WEB_DOMAIN=$BASE_DOMAIN
@@ -37,7 +39,8 @@ if [ "$WEB_SUBDOMAIN" != "" ]; then
   WEB_DOMAIN="$WEB_SUBDOMAIN.$BASE_DOMAIN"
 fi
 API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
-INTERNAL_DOMAIN="internal-$BASE_DOMAIN"
+IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
+INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 
 #
 # Supply the 32 byte encryption key for AES256 as an environment variable

@@ -22,7 +22,7 @@ services:
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api.${INTERNAL_DOMAIN}
+    hostname: api-${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
 
@@ -33,14 +33,14 @@ services:
   #
   token-handler-api:
     image: token-handler-standard:1.0.0
-    hostname: tokenhandler.${INTERNAL_DOMAIN}
+    hostname: tokenhandler-${INTERNAL_DOMAIN}
     volumes:
       - ./token-handler-api/dist/config.js:/usr/bff-api/dist/config.js
     environment:
       PORT: 3001
       TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"
       AUTHORIZE_ENDPOINT: "http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-authorize"
-      TOKEN_ENDPOINT: 'http://login.${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
+      TOKEN_ENDPOINT: 'http://login-${INTERNAL_DOMAIN}:8443/oauth/v2/oauth-token'
       LOGOUT_ENDPOINT: 'http://${IDSVR_DOMAIN}:8443/oauth/v2/oauth-session/logout'
       CLIENT_ID: 'spa-client'
       REDIRECT_URI: 'http://${WEB_DOMAIN}/'
@@ -90,7 +90,7 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login.${INTERNAL_DOMAIN}
+    hostname: login-${INTERNAL_DOMAIN}
     ports:
      - 6749:6749
      - 8443:8443
