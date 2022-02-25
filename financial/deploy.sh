@@ -53,7 +53,7 @@ INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 #
 # Support using an external identity provider, which must be preconfigured
 #
-if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_METADATA_PATH" != "" ]; then
+if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI_PATH" != "" ]; then
 
   # Point to an external identity server if required
   IDSVR_BASE_URL=$EXTERNAL_IDSVR_BASE_URL
@@ -61,7 +61,7 @@ if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_METADATA_PATH" != 
   DEPLOYMENT_PROFILE='WITHOUT_IDSVR'
 
   # Get the data
-  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_BASE_URL/$EXTERNAL_IDSVR_METADATA_PATH" \
+  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_BASE_URL/$EXTERNAL_IDSVR_ISSUER_URI_PATH/.well-known/openid-configuration" \
     -o metadata.json -w '%{http_code}')
   if [ "$HTTP_STATUS" != '200' ]; then
     echo "Problem encountered downloading metadata from external Identity Server: $HTTP_STATUS"
@@ -70,7 +70,7 @@ if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_METADATA_PATH" != 
 
   # Read endpoints
   METADATA=$(cat metadata.json)
-  ISSUER_URI="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
+  ISSUER_URI="$IDSVR_BASE_URL/$EXTERNAL_IDSVR_ISSUER_URI_PATH"
   AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
   AUTHORIZE_EXTERNAL_ENDPOINT=$AUTHORIZE_ENDPOINT
   TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
