@@ -28,7 +28,7 @@ if [ "$API_SUBDOMAIN" == "" ]; then
   echo "No API_SUBDOMAIN environment variable was supplied"
   exit 1
 fi
-if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_BASE_URL" == "" ]; then
+if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   echo "No identity server domain was supplied in an environment variable"
   exit 1
 fi
@@ -46,15 +46,15 @@ INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 #
 # Get OAuth related values as environment variables
 #
-if [ "$EXTERNAL_IDSVR_BASE_URL" != "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI_PATH" != "" ]; then
+if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
 
   # Point to an external identity provider if required
-  IDSVR_BASE_URL=$EXTERNAL_IDSVR_BASE_URL
-  IDSVR_INTERNAL_BASE_URL=$EXTERNAL_IDSVR_BASE_URL
+  IDSVR_BASE_URL="$(echo $EXTERNAL_IDSVR_ISSUER_URI | cut -d/ -f1-3)"
+  IDSVR_INTERNAL_BASE_URL="$IDSVR_BASE_URL"
   DEPLOYMENT_PROFILE='WITHOUT_IDSVR'
 
   # Get the data
-  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_BASE_URL/$EXTERNAL_IDSVR_ISSUER_URI_PATH/.well-known/openid-configuration" \
+  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_ISSUER_URI/.well-known/openid-configuration" \
     -o metadata.json -w '%{http_code}')
   if [ "$HTTP_STATUS" != '200' ]; then
     echo "Problem encountered downloading metadata from external Identity Server: $HTTP_STATUS"
