@@ -7,7 +7,7 @@ services:
 # The route for the token handler API is seen by the SPA as https://api.example.com/tokenhandler
 #
 - name: tokenhandler-api
-  url: https://tokenhandler-internal.example.com:3001/tokenhandler
+  url: https://tokenhandler-$INTERNAL_DOMAIN:3001/tokenhandler
   routes:
   - name: tokenhandler-api-route
     paths:
@@ -17,7 +17,7 @@ services:
 # The route for the business API is seen by the SPA as https://api.example.com/api
 #
 - name: business-api
-  url: https://api-internal.example.com:3002
+  url: https://api-$INTERNAL_DOMAIN:3002
   routes:
   - name: business-api-route
     paths:
@@ -28,18 +28,18 @@ services:
   # 1. The OAuth proxy plugin decrypts the secure cookie and forwards the opaque access token to the API endpoint
   - name: oauth-proxy
     config:
-      encryption_key: $ENCRYPTION_KEY
       cookie_name_prefix: example
+      encryption_key: $ENCRYPTION_KEY
       trusted_web_origins:
-      - https://www.example.com
+      - https://$WEB_DOMAIN
       cors_enabled: true
 
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
   - name: phantom-token
     config:
-      introspection_endpoint: https://login-internal.example.com:8443/oauth/v2/oauth-introspect
+      introspection_endpoint: $INTROSPECTION_ENDPOINT
       client_id: api-gateway-client
       client_secret: Password1
       token_cache_seconds: 900
       trusted_web_origins:
-      - https://www.example.com
+      - https://$WEB_DOMAIN

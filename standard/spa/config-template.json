@@ -1,0 +1,6 @@
+{
+    "businessApiBaseUrl": "http://$API_DOMAIN:3000/api",
+    "oauth": {
+        "tokenHandlerBaseUrl": "http://$API_DOMAIN:3000/tokenhandler"
+    }
+}

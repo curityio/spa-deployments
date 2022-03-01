@@ -17,36 +17,36 @@ services:
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
-  # It runs on port 3002 inside the cluster at http://api-internal.example.com:3002
+  # It runs on port 3002 inside the cluster at http://api.internal-example.com:3002
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/api
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api-internal.example.com
+    hostname: api-${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
 
   #
   # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at http://tokenhandler-internal.example.com:3001
+  # It runs on port 3001 inside the cluster at http://tokenhandler.internal-example.com:3001
   # The SPA accesses it via the reverse proxy at http://api.example.com:3000/tokenhandler
   #
   token-handler-api:
     image: token-handler-standard:1.0.0
-    hostname: tokenhandler-internal.example.com
+    hostname: tokenhandler-${INTERNAL_DOMAIN}
     volumes:
       - ./token-handler-api/dist/config.js:/usr/bff-api/dist/config.js
     environment:
       PORT: 3001
-      TRUSTED_WEB_ORIGIN: 'http://www.example.com'
-      AUTHORIZE_ENDPOINT: 'http://login.example.com:8443/oauth/v2/oauth-authorize'
-      TOKEN_ENDPOINT: 'http://login-internal.example.com:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: 'http://login.example.com:8443/oauth/v2/oauth-session/logout'
+      TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"
+      AUTHORIZE_ENDPOINT: "${AUTHORIZE_ENDPOINT}"
+      TOKEN_ENDPOINT: '${TOKEN_ENDPOINT}'
+      LOGOUT_ENDPOINT: '${LOGOUT_ENDPOINT}'
       CLIENT_ID: 'spa-client'
-      REDIRECT_URI: 'http://www.example.com/'
-      POST_LOGOUT_REDIRECT_URI: 'http://www.example.com/'
+      REDIRECT_URI: 'http://${WEB_DOMAIN}/'
+      POST_LOGOUT_REDIRECT_URI: 'http://${WEB_DOMAIN}/'
       SCOPE: 'openid profile'
-      COOKIE_DOMAIN: 'api.example.com'
+      COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
 
@@ -78,6 +78,8 @@ services:
   curity-data:
     image: postgres:13.2
     hostname: dbserver
+    profiles:
+      - WITH_IDSVR
     volumes:
       - ./idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
     environment:
@@ -90,13 +92,17 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login-internal.example.com
+    hostname: login-${INTERNAL_DOMAIN}
     ports:
-     - 6749:6749
-     - 8443:8443
+      - 6749:6749
+      - 8443:8443
+    profiles:
+      - WITH_IDSVR
     volumes:
-     - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
-     - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
-     - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
+      - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
+      - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
+      - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
     environment:
       PASSWORD: 'Password1'
+      IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
+      WEB_DOMAIN: "${WEB_DOMAIN}"

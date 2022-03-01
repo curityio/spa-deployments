@@ -3,5 +3,9 @@ token-handler-api
 oauth-proxy-plugin
 kong-phantom-token-plugin
 financial/certs/example*
+financial/certs/extensions.cnf
 .DS_Store
 kong.yml
+config.json
+encryption.key
+metadata.json

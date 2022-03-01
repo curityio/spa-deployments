@@ -24,15 +24,120 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 #
+# Basic sanity checks
+#
+if [ "$BASE_DOMAIN" == "" ]; then
+  echo "No BASE_DOMAIN environment variable was supplied"
+  exit 1
+fi
+if [ "$API_SUBDOMAIN" == "" ]; then
+  echo "No API_SUBDOMAIN environment variable was supplied"
+  exit 1
+fi
+if [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
+  echo "No identity server domain was supplied in an environment variable"
+  exit 1
+fi
+
+#
+# Set default domain details
+#
+WEB_DOMAIN=$BASE_DOMAIN
+if [ "$WEB_SUBDOMAIN" != "" ]; then
+  WEB_DOMAIN="$WEB_SUBDOMAIN.$BASE_DOMAIN"
+fi
+API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
+INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
+
+#
+# Support using an external identity provider, which must be preconfigured
+#
+if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
+
+  # Point to an external identity server if required
+  IDSVR_BASE_URL="$(echo $EXTERNAL_IDSVR_ISSUER_URI | cut -d/ -f1-3)"
+  IDSVR_INTERNAL_BASE_URL="$IDSVR_BASE_URL"
+  DEPLOYMENT_PROFILE='WITHOUT_IDSVR'
+
+  # Get the data
+  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_ISSUER_URI/.well-known/openid-configuration" \
+    -o metadata.json -w '%{http_code}')
+  if [ "$HTTP_STATUS" != '200' ]; then
+    echo "Problem encountered downloading metadata from external Identity Server: $HTTP_STATUS"
+    exit 1
+  fi
+
+  # Read endpoints
+  METADATA=$(cat metadata.json)
+  ISSUER_URI="$EXTERNAL_IDSVR_ISSUER_URI"
+  AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
+  AUTHORIZE_EXTERNAL_ENDPOINT=$AUTHORIZE_ENDPOINT
+  TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
+  INTROSPECTION_ENDPOINT=$(jq -r .introspection_endpoint <<< "$METADATA")
+  JWKS_ENDPOINT=$(jq -r .jwks_uri <<< "$METADATA")
+  LOGOUT_ENDPOINT=$(jq -r .end_session_endpoint <<< "$METADATA")
+
+else
+
+  # Deploy a Docker based identity server
+  IDSVR_BASE_URL="https://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
+  IDSVR_INTERNAL_BASE_URL="https://login-$INTERNAL_DOMAIN:8443"
+  DEPLOYMENT_PROFILE='WITH_IDSVR'
+
+  # Use Docker standard endpoints
+  ISSUER_URI="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
+  AUTHORIZE_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-authorize"
+  AUTHORIZE_EXTERNAL_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
+  TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"
+  INTROSPECTION_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-introspect"
+  JWKS_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-anonymous/jwks"
+  LOGOUT_ENDPOINT="${IDSVR_BASE_URL}/oauth/v2/oauth-session/logout"
+fi
+
+#
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #
-export ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
+ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
 
 #
-# Update the template file with the encryption key
+# Export variables needed for substitution and deployment
 #
+export BASE_DOMAIN
+export WEB_DOMAIN
+export API_DOMAIN
+export IDSVR_DOMAIN
+export INTERNAL_DOMAIN
+export IDSVR_BASE_URL
+export IDSVR_INTERNAL_BASE_URL
+export ISSUER_URI
+export AUTHORIZE_ENDPOINT
+export AUTHORIZE_EXTERNAL_ENDPOINT
+export TOKEN_ENDPOINT
+export INTROSPECTION_ENDPOINT
+export JWKS_ENDPOINT
+export LOGOUT_ENDPOINT
+export ENCRYPTION_KEY
+
+#
+# Update template files with the encryption key and other supplied environment variables
+#
+envsubst < ./spa/config-template.json        > ./spa/config.json
+envsubst < ./webhost/config-template.json    > ./webhost/config.json
+envsubst < ./api/config-template.json        > ./api/config.json
 envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
+envsubst < ./certs/extensions-template.cnf   > ./certs/extensions.cnf
+
+#
+# Generate OpenSSL certificates for development
+#
+cd certs
+./create-certs.sh
+if [ $? -ne 0 ]; then
+  echo "Problem encountered creating and installing certificates for the Token Handler"
+  exit 1
+fi
+cd ..
 
 #
 # Set an environment variable to reference the root CA used for the development setup
@@ -43,7 +148,8 @@ export FINANCIAL_GRADE_CLIENT_CA=$(openssl base64 -in './certs/example.ca.pem' |
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
-docker compose --project-name spa up --detach --force-recreate --remove-orphans
+docker compose --project-name spa down
+docker compose --profile $DEPLOYMENT_PROFILE --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1

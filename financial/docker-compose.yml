@@ -18,13 +18,13 @@ services:
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
-  # It runs on port 3002 inside the cluster at https://api-internal.example.com:3002
+  # It runs on port 3002 inside the cluster at https://api.internal-example.com:3002
   # The SPA accesses it via the reverse proxy at https://api.example.com:3000/api
   # The API calls the Authorization Server's JWKS endpoint inside the cluster
   #
   business-api:
     image: business-api:1.0.0
-    hostname: api-internal.example.com
+    hostname: api-${INTERNAL_DOMAIN}
     volumes:
       - ./api/config.json:/usr/api/config.json
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
@@ -34,13 +34,13 @@ services:
 
   #
   # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at https://tokenhandler-internal.example.com:3001
+  # It runs on port 3001 inside the cluster at https://tokenhandler.internal-example.com:3001
   # The SPA accesses it via the reverse proxy at https://api.example.com:3000/tokenhandler
   # The Token Handler API calls the Authorization Server's token endpoint inside the cluster
   #
   token-handler-api:
     image: token-handler-financial:1.0.0
-    hostname: tokenhandler-internal.example.com
+    hostname: tokenhandler-${INTERNAL_DOMAIN}
     volumes:
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
       - ./certs/example.client.p12:/usr/api/certs/example.client.p12
@@ -52,18 +52,18 @@ services:
       CLIENT_CERT_P12_PATH: './certs/example.client.p12'
       CLIENT_CERT_P12_PASSWORD: 'Password1'
       CA_CERT_PEM_PATH: './certs/example.ca.pem'
-      TRUSTED_WEB_ORIGIN: 'https://www.example.com'
-      ISSUER: 'https://login.example.com:8443/oauth/v2/oauth-anonymous'
-      JWKS_URI: 'https://login-internal.example.com:8443/oauth/v2/oauth-anonymous/jwks'
-      AUTHORIZE_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-authorize'
-      AUTHORIZE_EXTERNAL_ENDPOINT: 'https://login.example.com:8443/oauth/v2/oauth-authorize'
-      TOKEN_ENDPOINT: 'https://login-internal.example.com:8443/oauth/v2/oauth-token'
-      LOGOUT_ENDPOINT: 'https://login.example.com:8443/oauth/v2/oauth-session/logout'
+      TRUSTED_WEB_ORIGIN: "https://${WEB_DOMAIN}"
+      ISSUER: "${ISSUER_URI}"
+      JWKS_URI: '${JWKS_ENDPOINT}'
+      AUTHORIZE_ENDPOINT: '${AUTHORIZE_ENDPOINT}'
+      AUTHORIZE_EXTERNAL_ENDPOINT: "${AUTHORIZE_EXTERNAL_ENDPOINT}"
+      TOKEN_ENDPOINT: '${TOKEN_ENDPOINT}'
+      LOGOUT_ENDPOINT: "${LOGOUT_ENDPOINT}"
       CLIENT_ID: 'spa-client'
-      REDIRECT_URI: 'https://www.example.com/'
-      POST_LOGOUT_REDIRECT_URI: 'https://www.example.com/'
+      REDIRECT_URI: 'https://${WEB_DOMAIN}/'
+      POST_LOGOUT_REDIRECT_URI: 'https://${WEB_DOMAIN}/'
       SCOPE: 'openid profile'
-      COOKIE_DOMAIN: 'api.example.com'
+      COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
     command: >
@@ -106,6 +106,8 @@ services:
   curity-data:
     image: postgres:13.2
     hostname: dbserver
+    profiles:
+      - WITH_IDSVR
     volumes:
       - ./idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
     environment:
@@ -118,14 +120,19 @@ services:
   #
   curity-idsvr:
     image: curity.azurecr.io/curity/idsvr:6.7.0
-    hostname: login-internal.example.com
+    hostname: login-${INTERNAL_DOMAIN}
     ports:
-     - 6749:6749
-     - 8443:8443
+      - 6749:6749
+      - 8443:8443
+    profiles:
+      - WITH_IDSVR
     volumes:
-     - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
-     - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
-     - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
+      - ./idsvr/license.json:/opt/idsvr/etc/init/license/license.json
+      - ./idsvr/config-backup.xml:/opt/idsvr/etc/init/config.xml
+      - ./idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
     environment:
       PASSWORD: 'Password1'
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
+      IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
+      WEB_DOMAIN: "${WEB_DOMAIN}"
+      BASE_DOMAIN: "${BASE_DOMAIN}"

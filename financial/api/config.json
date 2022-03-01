@@ -1,7 +1,0 @@
-{
-    "port": 3002,
-    "trustedWebOrigin": "https://www.example.com",
-    "jwksUrl": "https://login-internal.example.com:8443/oauth/v2/oauth-anonymous/jwks",
-    "keystoreFilePath": "./certs/example.server.p12",
-    "keystorePassword": "Password1"
-}
