@@ -34,7 +34,7 @@ if [ "$API_SUBDOMAIN" == "" ]; then
   echo "No API_SUBDOMAIN environment variable was supplied"
   exit 1
 fi
-if [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
+if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   echo "No identity server domain was supplied in an environment variable"
   exit 1
 fi
