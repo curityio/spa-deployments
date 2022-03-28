@@ -135,7 +135,7 @@ envsubst < ./certs/extensions-template.cnf   > ./certs/extensions.cnf
 cd certs
 ./create-certs.sh
 if [ $? -ne 0 ]; then
-  echo "Problem encountered creating and installing certificates for the Token Handler"
+  echo "Problem encountered creating and installing certificates"
   exit 1
 fi
 cd ..

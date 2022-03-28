@@ -27,15 +27,13 @@ services:
       - ./api/config.json:/usr/api/config.json
 
   #
-  # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at http://tokenhandler.internal-example.com:3001
-  # The SPA accesses it via the reverse proxy at http://api.example.com:3000/tokenhandler
+  # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
+  # It runs on port 3001 inside the cluster at http://oauthagent.internal-example.com:3001
+  # The SPA accesses it via the reverse proxy at http://api.example.com:3000/oauth-agent
   #
-  token-handler-api:
-    image: token-handler-standard:1.0.0
-    hostname: tokenhandler-${INTERNAL_DOMAIN}
-    volumes:
-      - ./token-handler-api/dist/config.js:/usr/bff-api/dist/config.js
+  oauth-agent:
+    image: oauthagent-standard:1.0.0
+    hostname: oauthagent-${INTERNAL_DOMAIN}
     environment:
       PORT: 3001
       TRUSTED_WEB_ORIGIN: "http://${WEB_DOMAIN}"

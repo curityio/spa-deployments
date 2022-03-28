@@ -4,14 +4,14 @@ _transform: true
 services:
 
 #
-# The route for the token handler API is seen by the SPA as http://api.example.com/tokenhandler
+# The route for the OAuth Agent is seen by the SPA as http://api.example.com/oauth-agent
 #
-- name: tokenhandler-api
-  url: http://tokenhandler-$INTERNAL_DOMAIN:3001/tokenhandler
+- name: oauth-agent
+  url: http://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent
   routes:
-  - name: tokenhandler-api-route
+  - name: oauth-agent-api-route
     paths:
-    - /tokenhandler
+    - /oauth-agent
 
 #
 # The route for the business API is seen by the SPA as http://api.example.com/api

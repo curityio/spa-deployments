@@ -33,14 +33,14 @@ services:
       NODE_EXTRA_CA_CERTS: '/usr/api/certs/example.ca.pem'
 
   #
-  # The Token Handler API (OAuth Agent) provided by Curity is hosted here, to perform the OAuth work
-  # It runs on port 3001 inside the cluster at https://tokenhandler.internal-example.com:3001
-  # The SPA accesses it via the reverse proxy at https://api.example.com:3000/tokenhandler
-  # The Token Handler API calls the Authorization Server's token endpoint inside the cluster
+  # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
+  # It runs on port 3001 inside the cluster at https://oauthagent.internal-example.com:3001
+  # The SPA accesses it via the reverse proxy at https://api.example.com:3000/oauth-agent
+  # The OAuth Agent calls the Authorization Server's token endpoint inside the cluster
   #
-  token-handler-api:
-    image: token-handler-financial:1.0.0
-    hostname: tokenhandler-${INTERNAL_DOMAIN}
+  oauth-agent:
+    image: oauthagent-financial:1.0.0
+    hostname: oauthagent-${INTERNAL_DOMAIN}
     volumes:
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
       - ./certs/example.client.p12:/usr/api/certs/example.client.p12
@@ -73,7 +73,7 @@ services:
     
   #
   # The Kong reverse proxy exposes API endpoints to the browser at https://api.example.com:3000
-  # The reverse proxy calls the token handler API and the business API inside the cluster
+  # The reverse proxy routes to the OAuth Agent and the business API inside the cluster
   #
   reverse-proxy:
     image: kong:2.6.0-alpine

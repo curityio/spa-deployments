@@ -15,36 +15,45 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
-# Get and build the main Token Handler API (aka 'OAuth Agent')
+# TODO: Change the below path after Michal has renamed the repo
 #
-rm -rf token-handler-api
-git clone https://github.com/curityio/token-handler-node-express token-handler-api
+
+#
+# Get and build the OAuth Agent
+#
+rm -rf oauth-agent
+git clone https://github.com/curityio/token-handler-node-express oauth-agent
 if [ $? -ne 0 ]; then
-  echo "Problem encountered downloading the token handler API"
+  echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
+cd oauth-agent
 
-cd token-handler-api
+#
+# TODO: Delete this before merging
+#
+git checkout feature/oauth-agent-rename
+
 npm install
 if [ $? -ne 0 ]; then
-  echo "Problem encountered installing the Token Handler API dependencies"
+  echo "Problem encountered installing the OAuth Agent dependencies"
   exit 1
 fi
 
 npm run build
 if [ $? -ne 0 ]; then
-  echo "Problem encountered building the Token Handler API code"
+  echo "Problem encountered building the OAuth Agent code"
   exit 1
 fi
 
-docker build -f Dockerfile -t token-handler-standard:1.0.0 .
+docker build -f Dockerfile -t oauthagent-standard:1.0.0 .
 if [ $? -ne 0 ]; then
-  echo "Problem encountered building the Token Handler API Docker file"
+  echo "Problem encountered building the OAuth Agent Docker file"
   exit 1
 fi
 
 #
-# Get the 'OAuth Proxy', which is a simple reverse proxy plugin
+# Get the OAuth Proxy, which runs within an NGINX based reverse proxy
 #
 cd ..
 rm -rf oauth-proxy-plugin
