@@ -15,25 +15,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
-# TODO: Change the below path after Michal has renamed the repo
-#
-
-#
-# Get and build the main OAuth Agent
+# Get and build the OAuth Agent
 #
 rm -rf oauth-agent
-git clone https://github.com/curityio/token-handler-kotlin-spring-fapi oauth-agent
+git clone https://github.com/curityio/oauth-agent-kotlin-spring-fapi oauth-agent
 if [ $? -ne 0 ]; then
   echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
+
 cd oauth-agent
-
-#
-# TODO: Delete this before merging
-#
-git checkout feature/oauth-agent-rename
-
 ./gradlew bootJar
 if [ $? -ne 0 ]; then
   echo "Problem encountered building the OAuth Agent's Java code"
