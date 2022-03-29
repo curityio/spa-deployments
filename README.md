@@ -4,7 +4,7 @@
 [![Availability](https://img.shields.io/badge/availability-source-blue)](https://curity.io/resources/code-examples/status/)
 
 Supporting resources for deployment of SPA code examples which use the [Token Handler Pattern](https://curity.io/resources/learn/the-token-handler-pattern/).\
-The token handler manages OAuth work for the SPA and issues secure cookies to use in the browser:
+The OAuth Agent manages OpenID Connect work for the SPA and issues secure cookies to use in the browser:
 
 ![Logical Components](/images/logical-components.png)
 
@@ -30,15 +30,15 @@ Deployment on development computer involves the following main steps:
 
 Start with the main SPA repository, and follow the instructions in these pages:
 
-- [Standard SPA using an Authorization Code Flow (PKCE) and a Client Secret](https://github.com/curityio/web-oauth-via-bff/doc/Standard.md)
-- [Financial-grade SPA using Mutual TLS, PAR and JARM](https://github.com/curityio/web-oauth-via-bff/doc/Financial.md)
+- [Standard SPA using an Authorization Code Flow (PKCE) and a Client Secret](https://github.com/curityio/spa-using-token-handler/blob/main/doc/Standard.md)
+- [Financial-grade SPA using Mutual TLS, PAR and JARM](https://github.com/curityio/spa-using-token-handler/blob/main/doc/Financial.md)
 
-## Running a Token Handler without a Browser
+## Running an OAuth Agent without a Browser
 
-See the following repositories for further details on how to extend a token handler:
+See the following repositories for further details on how to work with an OAuth Agent:
 
-- [Standard Token Handler in Node.js](https://github.com/curityio/token-handler-node-express)
-- [Financial-grade Token Handler in Kotlin](https://github.com/curityio/token-handler-kotlin-spring-fapi)
+- [Standard OAuth Agent in Node.js](https://github.com/curityio/oauth-agent-node-express)
+- [Financial-grade OAuth Agent in Kotlin](https://github.com/curityio/oauth-agent-kotlin-spring-fapi)
 
 ## More Information
 

@@ -1,5 +1,5 @@
 license.json
-token-handler-api
+oauth-agent
 oauth-proxy-plugin
 kong-phantom-token-plugin
 financial/certs/example*

@@ -15,30 +15,30 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
-# Get and build the main Token Handler API (aka 'OAuth Agent')
+# Get and build the OAuth Agent
 #
-rm -rf token-handler-api
-git clone https://github.com/curityio/token-handler-kotlin-spring-fapi token-handler-api
+rm -rf oauth-agent
+git clone https://github.com/curityio/oauth-agent-kotlin-spring-fapi oauth-agent
 if [ $? -ne 0 ]; then
-  echo "Problem encountered downloading the token handl+er API"
+  echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
 
-cd token-handler-api
+cd oauth-agent
 ./gradlew bootJar
 if [ $? -ne 0 ]; then
-  echo "Problem encountered building the Token Handler API's Java code"
+  echo "Problem encountered building the OAuth Agent's Java code"
   exit 1
 fi
 
-docker build -f Dockerfile -t token-handler-financial:1.0.0 .
+docker build -f Dockerfile -t oauthagent-financial:1.0.0 .
 if [ $? -ne 0 ]; then
-  echo "Problem encountered building the Token Handler API Docker file"
+  echo "Problem encountered building the OAuth Agent Docker file"
   exit 1
 fi
 
 #
-# Get the 'OAuth Proxy', which is a simple reverse proxy plugin
+# Get the OAuth Proxy, which runs within an NGINX based reverse proxy
 #
 cd ..
 rm -rf oauth-proxy-plugin
