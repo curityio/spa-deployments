@@ -23,8 +23,13 @@ if [ $? -ne 0 ]; then
   echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
-
 cd oauth-agent
+
+#
+# TODO: Delete this before merging
+#
+git checkout feature/spa-extensibility
+
 ./gradlew bootJar
 if [ $? -ne 0 ]; then
   echo "Problem encountered building the OAuth Agent's Java code"

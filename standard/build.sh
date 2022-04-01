@@ -32,7 +32,7 @@ cd oauth-agent
 #
 # TODO: Delete this before merging
 #
-git checkout feature/oauth-agent-rename
+git checkout feature/spa-extensibility
 
 npm install
 if [ $? -ne 0 ]; then
