@@ -65,6 +65,7 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
   METADATA=$(cat metadata.json)
   AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
   TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
+  USERINFO_ENDPOINT=$(jq -r .userinfo_endpoint <<< "$METADATA")
   INTROSPECTION_ENDPOINT=$(jq -r .introspection_endpoint <<< "$METADATA")
   JWKS_ENDPOINT=$(jq -r .jwks_uri <<< "$METADATA")
   LOGOUT_ENDPOINT=$(jq -r .end_session_endpoint <<< "$METADATA")
@@ -79,6 +80,7 @@ else
   # Use Docker standard endpoints
   AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
   TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"
+  USERINFO_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-userinfo"
   INTROSPECTION_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-introspect"
   JWKS_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-anonymous/jwks"
   LOGOUT_ENDPOINT="${IDSVR_BASE_URL}/oauth/v2/oauth-session/logout"
