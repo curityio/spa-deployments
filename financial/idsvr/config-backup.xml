@@ -370,6 +370,7 @@
         <endpoint>
           <id>token-service-userinfo</id>
           <uri>/oauth/v2/oauth-userinfo</uri>
+          <client-authentication>allow</client-authentication>
           <endpoint-kind>oauth-userinfo</endpoint-kind>
         </endpoint>
       </endpoints>
