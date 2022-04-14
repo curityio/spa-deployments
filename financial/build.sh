@@ -23,8 +23,8 @@ if [ $? -ne 0 ]; then
   echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
-
 cd oauth-agent
+
 ./gradlew bootJar
 if [ $? -ne 0 ]; then
   echo "Problem encountered building the OAuth Agent's Java code"
