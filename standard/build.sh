@@ -29,11 +29,6 @@ if [ $? -ne 0 ]; then
 fi
 cd oauth-agent
 
-#
-# TODO: Delete this before merging
-#
-git checkout feature/oauth-agent-rename
-
 npm install
 if [ $? -ne 0 ]; then
   echo "Problem encountered installing the OAuth Agent dependencies"
