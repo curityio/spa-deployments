@@ -15,24 +15,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
-# TODO: Change the below path after Michal has renamed the repo
-#
-
-#
 # Get and build the OAuth Agent
 #
 rm -rf oauth-agent
-git clone https://github.com/curityio/token-handler-node-express oauth-agent
+git clone https://github.com/curityio/oauth-agent-node-express oauth-agent
 if [ $? -ne 0 ]; then
   echo "Problem encountered downloading the OAuth Agent"
   exit 1
 fi
 cd oauth-agent
-
-#
-# TODO: Delete this before merging
-#
-git checkout feature/spa-extensibility
 
 npm install
 if [ $? -ne 0 ]; then
