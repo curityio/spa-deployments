@@ -38,12 +38,13 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Build the reverse proxy's custom dockerfile
+# Get the OAuth Proxy, which runs within an NGINX based reverse proxy
 #
-cd ../reverse-proxy
-docker build -f Dockerfile -t custom_kong:2.6.0-alpine .
+cd ..
+rm -rf oauth-proxy-plugin
+git clone https://github.com/curityio/nginx-lua-oauth-proxy-plugin oauth-proxy-plugin
 if [ $? -ne 0 ]; then
-  echo "Problem encountered downloading the Kong OAuth Proxy Docker file"
+  echo "Problem encountered downloading the OAuth proxy plugin"
   exit 1
 fi
 

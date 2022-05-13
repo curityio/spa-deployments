@@ -77,13 +77,16 @@ services:
   # The reverse proxy routes to the OAuth Agent and the business API inside the cluster
   #
   reverse-proxy:
-    image: custom_kong:2.6.0-alpine
+    image: kong:2.6.0-alpine
     hostname: reverseproxy
     ports:
       - 3000:3000
     volumes:
       - ./reverse-proxy/kong.yml:/usr/local/kong/declarative/kong.yml
       - ./kong-phantom-token-plugin/plugin:/usr/local/share/lua/5.1/kong/plugins/phantom-token
+      - ./oauth-proxy-plugin/plugin/plugin.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/access.lua
+      - ./oauth-proxy-plugin/plugin/handler.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/handler.lua
+      - ./oauth-proxy-plugin/plugin/schema.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/schema.lua
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
