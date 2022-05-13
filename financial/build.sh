@@ -42,9 +42,9 @@ cd ..
 # Build the reverse proxy's custom dockerfile
 #
 cd reverse-proxy
-docker build -f Dockerfile -t custom_kong:2.6.0-alpine .
+docker build --no-cache -f Dockerfile -t custom_kong:2.6.0-alpine .
 if [ $? -ne 0 ]; then
-  echo "Problem encountered downloading the Kong OAuth Proxy Docker file"
+  echo "Problem encountered building the Reverse Proxy Docker file"
   exit 1
 fi
 cd ..
