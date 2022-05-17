@@ -83,7 +83,6 @@ services:
       - 3000:3000
     volumes:
       - ./reverse-proxy/kong.yml:/usr/local/kong/declarative/kong.yml
-      - ./kong-phantom-token-plugin/plugin:/usr/local/share/lua/5.1/kong/plugins/phantom-token
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
