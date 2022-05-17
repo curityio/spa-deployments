@@ -55,12 +55,3 @@ if [ $? -ne 0 ]; then
 fi
 cd ..
 
-#
-# Also download the phantom token plugin for the reverse proxy
-#
-rm -rf kong-phantom-token-plugin
-git clone https://github.com/curityio/kong-phantom-token-plugin
-if [ $? -ne 0 ]; then
-  echo "Problem encountered downloading the phantom token plugin"
-  exit 1
-fi
