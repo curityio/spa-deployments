@@ -132,3 +132,4 @@ services:
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
       BASE_DOMAIN: "${BASE_DOMAIN}"
+      LOGGING_LEVEL: 'DEBUG'
