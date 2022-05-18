@@ -100,3 +100,4 @@ services:
       PASSWORD: 'Password1'
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
+      LOGGING_LEVEL: 'DEBUG'
