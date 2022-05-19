@@ -53,16 +53,12 @@ services:
   # The Kong reverse proxy exposes API endpoints to the browser at http://api.example.com:3000
   #
   reverse-proxy:
-    image: kong:2.6.0-alpine
+    image: custom_kong:2.6.0-alpine
     hostname: reverseproxy
     ports:
       - 3000:3000
     volumes:
       - ./reverse-proxy/kong.yml:/usr/local/kong/declarative/kong.yml
-      - ./kong-phantom-token-plugin/plugin:/usr/local/share/lua/5.1/kong/plugins/phantom-token
-      - ./oauth-proxy-plugin/plugin/plugin.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/access.lua
-      - ./oauth-proxy-plugin/plugin/handler.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/handler.lua
-      - ./oauth-proxy-plugin/plugin/schema.lua:/usr/local/share/lua/5.1/kong/plugins/oauth-proxy/schema.lua
     environment:
       KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: '/usr/local/kong/declarative/kong.yml'
@@ -104,3 +100,4 @@ services:
       PASSWORD: 'Password1'
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
+      LOGGING_LEVEL: 'DEBUG'
