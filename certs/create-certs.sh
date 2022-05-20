@@ -5,6 +5,11 @@
 ########################################################################
 
 #
+# Ensure that we are in the folder containing this script
+#
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+#
 # Fail on first error
 #
 set -e
@@ -27,21 +32,26 @@ case "$(uname -s)" in
 esac
 
 #
-# Root certificate parameters
+# First create the extensions.cnf file with the runtime domains
+#
+envsubst < ./extensions-template.cnf > ./extensions.cnf
+
+#
+# Define root certificate parameters
 #
 TRUSTSTORE_FILE_PREFIX='example.ca'
 TRUSTSTORE_PASSWORD='Password1'
 TRUSTSTORE_NAME="Self Signed CA for $BASE_DOMAIN"
 
 #
-# Server certificate parameters
+# Define server certificate parameters
 #
 SERVER_KEYSTORE_FILE_PREFIX='example.server'
 SERVER_KEYSTORE_PASSWORD='Password1'
 WILDCARD_DOMAIN_NAME="*.$BASE_DOMAIN"
 
 #
-# Client certificate parameters used for Mutual TLS
+# Define client certificate parameters used for Mutual TLS
 #
 CLIENT_KEYSTORE_FILE_PREFIX='example.client'
 CLIENT_KEYSTORE_NAME="financial-grade-spa, OU=$BASE_DOMAIN, O=Curity AB, C=SE"

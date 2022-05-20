@@ -7,7 +7,7 @@ services:
 # The route for the OAuth Agent is seen by the SPA as http://api.example.com/oauth-agent
 #
 - name: oauth-agent
-  url: http://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent
+  url: $SCHEME://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent
   routes:
   - name: oauth-agent-api-route
     paths:
@@ -17,7 +17,7 @@ services:
 # The route for the business API is seen by the SPA as http://api.example.com/api
 #
 - name: business-api
-  url: http://api-$INTERNAL_DOMAIN:3002
+  url: $SCHEME://api-$INTERNAL_DOMAIN:3002
   routes:
   - name: business-api-route
     paths:
@@ -31,7 +31,7 @@ services:
       cookie_name_prefix: example
       encryption_key: $ENCRYPTION_KEY
       trusted_web_origins:
-      - http://$WEB_DOMAIN
+      - $SCHEME://$WEB_DOMAIN
       cors_enabled: true
   
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
@@ -42,4 +42,4 @@ services:
       client_secret: Password1
       token_cache_seconds: 900
       trusted_web_origins:
-      - http://$WEB_DOMAIN
+      - $SCHEME://$WEB_DOMAIN

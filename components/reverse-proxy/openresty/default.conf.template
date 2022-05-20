@@ -18,7 +18,7 @@ server {
         resolver 127.0.0.11;
         
         # Route directly to the OAuth Agent inside the cluster
-        proxy_pass http://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent;
+        proxy_pass $SCHEME://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent;
     }
  
     location /api/ {
@@ -34,7 +34,7 @@ server {
                 cookie_name_prefix = 'example',
                 encryption_key = '$ENCRYPTION_KEY',
                 trusted_web_origins = {
-                    'http://$WEB_DOMAIN'
+                    '$SCHEME://$WEB_DOMAIN'
                 },
                 cors_enabled = true
             }
@@ -53,6 +53,6 @@ server {
         }
 
         # Then forward the JWT to the below API
-        proxy_pass http://api-$INTERNAL_DOMAIN:3002/;
+        proxy_pass $SCHEME://api-$INTERNAL_DOMAIN:3002/;
     }
 }

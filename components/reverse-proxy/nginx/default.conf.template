@@ -19,7 +19,7 @@ server {
         resolver 127.0.0.11;
         
         # Route directly to the OAuth Agent inside the cluster
-        proxy_pass http://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent;
+        proxy_pass $SCHEME://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent;
     }
  
     location /api/ {
@@ -31,7 +31,7 @@ server {
         oauth_proxy on;
         oauth_proxy_cookie_name_prefix example;
         oauth_proxy_encryption_key $ENCRYPTION_KEY;
-        oauth_proxy_trusted_web_origin http://$WEB_DOMAIN;
+        oauth_proxy_trusted_web_origin $SCHEME://$WEB_DOMAIN;
         oauth_proxy_cors_enabled on;
 
         # Then run the Phantom Token plugin to translate opaque access tokens to JWT access tokens
@@ -40,7 +40,7 @@ server {
         phantom_token_introspection_endpoint curity;
         
         # Then forward the JWT to the below API
-        proxy_pass http://api-$INTERNAL_DOMAIN:3002/;
+        proxy_pass $SCHEME://api-$INTERNAL_DOMAIN:3002/;
     }
 
     location curity {

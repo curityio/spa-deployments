@@ -12,17 +12,34 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 # First check prerequisites
 #
-if [ ! -f './idsvr/license.json' ]; then
-  echo "Please provide a license.json file in the standard/idsvr folder in order to deploy the system"
+if [ ! -f './components/idsvr/license.json' ]; then
+  echo "Please provide a license.json file in the components/idsvr folder in order to deploy the system"
   exit 1
+fi
+
+#
+# Get the scenario to deploy
+#
+if [ "$1" == 'financial' ]; then
+  SCENARIO='financial'
+  DOCKER_COMPOSE_FILE='docker-compose-financial.yml'
+  SCHEME='https'
+  SSL_CERT_FILE_PATH='./certs/example.server.p12'
+  SSL_CERT_PASSWORD='Password1'
+else
+  SCENARIO='standard'
+  DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
+  SCHEME='http'
+  SSL_CERT_FILE_PATH=''
+  SSL_CERT_PASSWORD=''
 fi
 
 #
 # Different reverse proxies use different plugins and configuration techniques
 #
-if [ "$1" == 'nginx' ]; then
+if [ "$2" == 'nginx' ]; then
   REVERSE_PROXY_PROFILE='NGINX'
-elif [ "$1" == 'openresty' ]; then
+elif [ "$2" == 'openresty' ]; then
   REVERSE_PROXY_PROFILE='OPENRESTY'
 else
   REVERSE_PROXY_PROFILE='KONG'
@@ -60,6 +77,7 @@ if [ "$WEB_SUBDOMAIN" != "" ]; then
   WEB_DOMAIN="$WEB_SUBDOMAIN.$BASE_DOMAIN"
 fi
 API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
+IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
 INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 
 #
@@ -73,8 +91,7 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
   IDSVR_PROFILE='WITHOUT_IDSVR'
 
   # Get the data
-  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_ISSUER_URI/.well-known/openid-configuration" \
-    -o metadata.json -w '%{http_code}')
+  HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_ISSUER_URI/.well-known/openid-configuration" -o metadata.json -w '%{http_code}')
   if [ "$HTTP_STATUS" != '200' ]; then
     echo "Problem encountered downloading metadata from external Identity Server: $HTTP_STATUS"
     exit 1
@@ -82,7 +99,9 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
 
   # Read endpoints
   METADATA=$(cat metadata.json)
+  ISSUER_URI="$EXTERNAL_IDSVR_ISSUER_URI"
   AUTHORIZE_ENDPOINT=$(jq -r .authorization_endpoint <<< "$METADATA")
+  AUTHORIZE_INTERNAL_ENDPOINT=$AUTHORIZE_ENDPOINT
   TOKEN_ENDPOINT=$(jq -r .token_endpoint <<< "$METADATA")
   USERINFO_ENDPOINT=$(jq -r .userinfo_endpoint <<< "$METADATA")
   INTROSPECTION_ENDPOINT=$(jq -r .introspection_endpoint <<< "$METADATA")
@@ -92,12 +111,14 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
 else
 
   # Deploy a Docker based identity server
-  IDSVR_BASE_URL="http://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
-  IDSVR_INTERNAL_BASE_URL="http://login-$INTERNAL_DOMAIN:8443"
+  IDSVR_BASE_URL="$SCHEME://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
+  IDSVR_INTERNAL_BASE_URL="$SCHEME://login-$INTERNAL_DOMAIN:8443"
   IDSVR_PROFILE='WITH_IDSVR'
 
   # Use Docker standard endpoints
+  ISSUER_URI="$IDSVR_BASE_URL/oauth/v2/oauth-anonymous"
   AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
+  AUTHORIZE_INTERNAL_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-authorize"
   TOKEN_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-token"
   USERINFO_ENDPOINT="$IDSVR_INTERNAL_BASE_URL/oauth/v2/oauth-userinfo"
   INTROSPECTION_ENDPOINT="${IDSVR_INTERNAL_BASE_URL}/oauth/v2/oauth-introspect"
@@ -114,53 +135,87 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 # Export variables needed for substitution and deployment
 #
+export SCHEME
 export BASE_DOMAIN
 export WEB_DOMAIN
 export API_DOMAIN
+export IDSVR_DOMAIN
 export INTERNAL_DOMAIN
 export IDSVR_BASE_URL
 export IDSVR_INTERNAL_BASE_URL
+export ISSUER_URI
 export AUTHORIZE_ENDPOINT
+export AUTHORIZE_INTERNAL_ENDPOINT
 export TOKEN_ENDPOINT
 export USERINFO_ENDPOINT
 export INTROSPECTION_ENDPOINT
 export JWKS_ENDPOINT
 export LOGOUT_ENDPOINT
 export ENCRYPTION_KEY
+export SSL_CERT_FILE_PATH
+export SSL_CERT_PASSWORD
 
 #
 # Update template files with the encryption key and other supplied environment variables
 #
+cd components
 envsubst < ./spa/config-template.json     > ./spa/config.json
 envsubst < ./webhost/config-template.json > ./webhost/config.json
 envsubst < ./api/config-template.json     > ./api/config.json
+cd ..
 
 #
-# Update the reverse proxy configuration with runtime values such as the encryption key
+# Create certificates when deploying the financial grade scenario
+# Also set a variable passed through to components/idsvr/config-backup-financial.xml
 #
+if [ "$SCENARIO" == 'financial' ]; then
+
+  if [ ! -f './certs/example.ca.pem' ]; then
+    ./certs/create-certs.sh
+    if [ $? -ne 0 ]; then
+      echo "Problem encountered creating and installing certificates"
+      exit 1
+    fi
+  fi
+  export FINANCIAL_GRADE_CLIENT_CA=$(openssl base64 -in './certs/example.ca.pem' | tr -d '\n')
+fi
+
+#
+# Update the reverse proxy configuration with runtime values, including the cookie encryption key
+#
+cd components/reverse-proxy
 if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 
   # Use NGINX if specified on the command line
-  envsubst < ./reverse-proxy/nginx/default.conf.template | sed -e 's/§/$/g' > ./reverse-proxy/nginx/default.conf
+  envsubst < ./nginx/default.conf.template | sed -e 's/§/$/g' > ./nginx/default.conf
 
 elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
 
   # Use OpenResty if specified on the command line
-  envsubst < ./reverse-proxy/openresty/default.conf.template > ./reverse-proxy/openresty/default.conf
+  envsubst < ./openresty/default.conf.template > ./openresty/default.conf
 
 else
   
-  # Use Kong by default
-  envsubst < ./reverse-proxy/kong/kong-template.yml > ./reverse-proxy/kong/kong.yml
+  # Use Kong otherwise
+  envsubst < ./kong/kong-template.yml > ./kong/kong.yml
 fi
+cd ../..
 
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
-echo "Deploying resources using $REVERSE_PROXY_PROFILE reverse proxy and the Curity Identity Server at $IDSVR_BASE_URL ..."
+echo "Deploying resources for the $SCENARIO scenario using $REVERSE_PROXY_PROFILE reverse proxy ..."
 docker compose --project-name spa down
-docker compose --profile $IDSVR_PROFILE --profile $REVERSE_PROXY_PROFILE --project-name spa up --detach
+docker compose --file $DOCKER_COMPOSE_FILE --profile $IDSVR_PROFILE --profile $REVERSE_PROXY_PROFILE --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1
 fi
+
+#
+# Configure Identity Server certificates when deploying the financial grade scenario
+#
+if [ "$SCENARIO" == 'financial' ]; then
+  ./deploy-idsvr-certs.sh
+fi
+
