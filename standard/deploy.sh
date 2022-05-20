@@ -157,6 +157,7 @@ fi
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
+echo "Deploying resources using $REVERSE_PROXY_PROFILE reverse proxy and the Curity Identity Server at $IDSVR_BASE_URL ..."
 docker compose --project-name spa down
 docker compose --profile $IDSVR_PROFILE --profile $REVERSE_PROXY_PROFILE --project-name spa up --detach
 if [ $? -ne 0 ]; then

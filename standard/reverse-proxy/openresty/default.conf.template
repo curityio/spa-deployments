@@ -1,1 +1,58 @@
-TODO
+########################################################################################
+# An NGINX configuration to test Lua plugins for the example SPA in an end-to-end manner
+########################################################################################
+
+lua_shared_dict phantom-token 10m;
+server {
+    server_name reverseproxy;
+    listen      3000;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    location /oauth-agent {
+
+        # Use the Docker embedded DNS server
+        resolver 127.0.0.11;
+        
+        # Route directly to the OAuth Agent inside the cluster
+        proxy_pass http://oauthagent-$INTERNAL_DOMAIN:3001/oauth-agent;
+    }
+ 
+    location /api/ {
+
+        # Use the Docker embedded DNS server
+        resolver 127.0.0.11;
+
+        rewrite_by_lua_block {
+            
+            -- First run the OAuth Proxy plugin to translate secure cookies to opaque access tokens
+            local oauthProxyConfig = {
+                cookie_name_prefix = 'example',
+                encryption_key = '$ENCRYPTION_KEY',
+                trusted_web_origins = {
+                    'http://$WEB_DOMAIN'
+                },
+                cors_enabled = true
+            }
+            local oauthProxy = require 'resty.oauth-proxy'
+            oauthProxy.run(oauthProxyConfig)
+
+            -- Then run the Phantom Token plugin to translate opaque access tokens to JWT access tokens
+            local phantomTokenConfig = {
+                introspection_endpoint = '$INTROSPECTION_ENDPOINT',
+                client_id = 'api-gateway-client',
+                client_secret = 'Password1',
+                cache_name = 'phantom-token',
+                time_to_live_seconds = 900
+            }
+            local phantomToken = require 'resty.phantom-token'
+            phantomToken.run(phantomTokenConfig)
+        }
+
+        # Then forward the JWT to the below API
+        proxy_pass http://api-$INTERNAL_DOMAIN:3002/;
+    }
+}

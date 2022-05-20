@@ -24,6 +24,7 @@ elif [ "$1" == 'openresty' ]; then
 else
   REVERSE_PROXY_PROFILE='KONG'
 fi
+echo "Building resources using $REVERSE_PROXY_PROFILE reverse proxy ..."
 
 #
 # Build the reverse proxy's custom dockerfile
