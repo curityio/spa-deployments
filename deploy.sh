@@ -18,7 +18,7 @@ if [ ! -f './components/idsvr/license.json' ]; then
 fi
 
 #
-# Get the scenario to deploy
+# Get the scenario to deploy and set some variables
 #
 if [ "$1" == 'financial' ]; then
   SCENARIO='financial'
@@ -26,12 +26,14 @@ if [ "$1" == 'financial' ]; then
   SCHEME='https'
   SSL_CERT_FILE_PATH='./certs/example.server.p12'
   SSL_CERT_PASSWORD='Password1'
+  NGINX_TEMPLATE_FILE_NAME='default.conf.financial.template'
 else
   SCENARIO='standard'
   DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
   SCHEME='http'
   SSL_CERT_FILE_PATH=''
   SSL_CERT_PASSWORD=''
+  NGINX_TEMPLATE_FILE_NAME='default.conf.standard.template'
 fi
 
 #
@@ -46,15 +48,7 @@ else
 fi
 
 #
-# TODO: delete after testing
-#
-export BASE_DOMAIN='example.com'
-export WEB_SUBDOMAIN='www'
-export API_SUBDOMAIN='api'
-export IDSVR_SUBDOMAIN='login'
-
-#
-# Basic sanity checks
+# These variables must be passed in from the parent script in the spa-using-token-handler repo
 #
 if [ "$BASE_DOMAIN" == "" ]; then
   echo "No BASE_DOMAIN environment variable was supplied"
@@ -187,12 +181,12 @@ cd components/reverse-proxy
 if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 
   # Use NGINX if specified on the command line
-  envsubst < ./nginx/default.conf.template | sed -e 's/§/$/g' > ./nginx/default.conf
+  envsubst < "./nginx/$NGINX_TEMPLATE_FILE_NAME" | sed -e 's/§/$/g' > ./nginx/default.conf
 
 elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
 
   # Use OpenResty if specified on the command line
-  envsubst < ./openresty/default.conf.template > ./openresty/default.conf
+  envsubst < "./openresty/$NGINX_TEMPLATE_FILE_NAME" > ./openresty/default.conf
 
 else
   

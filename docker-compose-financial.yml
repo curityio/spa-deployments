@@ -112,10 +112,6 @@ services:
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
-    environment:
-      SSL_CERT: '/usr/local/share/certs/example.server.pem'
-      SSL_CERT_KEY: './usr/local/share/certs/example.server.key'
-      LUA_SSL_TRUSTED_CERTIFICATE: './usr/local/share/certs/example.ca.pem'
     profiles:
       - NGINX
 
@@ -132,10 +128,6 @@ services:
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
-    environment:
-      SSL_CERT: '/usr/local/share/certs/example.server.pem'
-      SSL_CERT_KEY: './usr/local/share/certs/example.server.key'
-      SSL_TRUSTED_CERTIFICATE: './usr/local/share/certs/example.ca.pem'
     profiles:
       - OPENRESTY
 
