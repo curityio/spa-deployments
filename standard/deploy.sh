@@ -18,6 +18,25 @@ if [ ! -f './idsvr/license.json' ]; then
 fi
 
 #
+# Different reverse proxies use different plugins and configuration techniques
+#
+if [ "$1" == 'nginx' ]; then
+  REVERSE_PROXY_PROFILE='NGINX'
+elif [ "$1" == 'openresty' ]; then
+  REVERSE_PROXY_PROFILE='OPENRESTY'
+else
+  REVERSE_PROXY_PROFILE='KONG'
+fi
+
+#
+# TODO: delete after testing
+#
+export BASE_DOMAIN='example.com'
+export WEB_SUBDOMAIN='www'
+export API_SUBDOMAIN='api'
+export IDSVR_SUBDOMAIN='login'
+
+#
 # Basic sanity checks
 #
 if [ "$BASE_DOMAIN" == "" ]; then
@@ -51,7 +70,7 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
   # Point to an external identity provider if required
   IDSVR_BASE_URL="$(echo $EXTERNAL_IDSVR_ISSUER_URI | cut -d/ -f1-3)"
   IDSVR_INTERNAL_BASE_URL="$IDSVR_BASE_URL"
-  DEPLOYMENT_PROFILE='WITHOUT_IDSVR'
+  IDSVR_PROFILE='WITHOUT_IDSVR'
 
   # Get the data
   HTTP_STATUS=$(curl -k -s "$EXTERNAL_IDSVR_ISSUER_URI/.well-known/openid-configuration" \
@@ -75,7 +94,7 @@ else
   # Deploy a Docker based identity server
   IDSVR_BASE_URL="http://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
   IDSVR_INTERNAL_BASE_URL="http://login-$INTERNAL_DOMAIN:8443"
-  DEPLOYMENT_PROFILE='WITH_IDSVR'
+  IDSVR_PROFILE='WITH_IDSVR'
 
   # Use Docker standard endpoints
   AUTHORIZE_ENDPOINT="$IDSVR_BASE_URL/oauth/v2/oauth-authorize"
@@ -112,16 +131,34 @@ export ENCRYPTION_KEY
 #
 # Update template files with the encryption key and other supplied environment variables
 #
-envsubst < ./spa/config-template.json        > ./spa/config.json
-envsubst < ./webhost/config-template.json    > ./webhost/config.json
-envsubst < ./api/config-template.json        > ./api/config.json
-envsubst < ./reverse-proxy/kong-template.yml > ./reverse-proxy/kong.yml
+envsubst < ./spa/config-template.json     > ./spa/config.json
+envsubst < ./webhost/config-template.json > ./webhost/config.json
+envsubst < ./api/config-template.json     > ./api/config.json
+
+#
+# Update the reverse proxy configuration with runtime values such as the encryption key
+#
+if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
+
+  # Use NGINX if specified on the command line
+  envsubst < ./reverse-proxy/nginx/default.conf.template | sed -e 's/§/$/g' > ./reverse-proxy/nginx/default.conf
+
+elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
+
+  # Use OpenResty if specified on the command line
+  envsubst < ./reverse-proxy/openresty/default.conf.template > ./reverse-proxy/openresty/default.conf
+
+else
+  
+  # Use Kong by default
+  envsubst < ./reverse-proxy/kong/kong-template.yml > ./reverse-proxy/kong/kong.yml
+fi
 
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
 docker compose --project-name spa down
-docker compose --profile $DEPLOYMENT_PROFILE --project-name spa up --detach
+docker compose --profile $IDSVR_PROFILE --profile $REVERSE_PROXY_PROFILE --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1

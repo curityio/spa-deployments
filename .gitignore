@@ -6,6 +6,7 @@ financial/certs/example*
 financial/certs/extensions.cnf
 .DS_Store
 kong.yml
+default.conf
 config.json
 encryption.key
 metadata.json

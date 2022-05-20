@@ -15,6 +15,60 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 cp ../hooks/pre-commit ../.git/hooks
 
 #
+# Different reverse proxies use different plugins and configuration techniques
+#
+if [ "$1" == 'nginx' ]; then
+  REVERSE_PROXY_PROFILE='NGINX'
+elif [ "$1" == 'openresty' ]; then
+  REVERSE_PROXY_PROFILE='OPENRESTY'
+else
+  REVERSE_PROXY_PROFILE='KONG'
+fi
+
+#
+# Build the reverse proxy's custom dockerfile
+#
+if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
+
+  # Use NGINX if specified on the command line
+  cd reverse-proxy/nginx
+  docker build --no-cache -f Dockerfile -t custom_nginx:1.21.3-alpine .
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered building the NGINX Reverse Proxy Docker file"
+    exit 1
+  fi
+  
+  # Download modules
+  cd reverse-proxy/openresty
+  docker build --no-cache -f Dockerfile -t custom_openresty/openresty:1.19.9.1-2-bionic .
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered building the OpenResty Reverse Proxy Docker file"
+    exit 1
+  fi
+
+elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
+
+  # Use OpenResty if specified on the command line
+  cd reverse-proxy/openresty
+  docker build --no-cache -f Dockerfile -t custom_openresty/openresty:1.19.9.1-2-bionic .
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered building the OpenResty Reverse Proxy Docker file"
+    exit 1
+  fi
+
+else
+  
+  # Use Kong by default
+  cd reverse-proxy/kong
+  docker build --no-cache -f Dockerfile -t custom_kong:2.6.0-alpine .
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered building the Kong Reverse Proxy Docker file"
+    exit 1
+  fi
+fi
+cd ../..
+
+#
 # Get and build the OAuth Agent
 #
 rm -rf oauth-agent
@@ -42,16 +96,3 @@ if [ $? -ne 0 ]; then
   echo "Problem encountered building the OAuth Agent Docker file"
   exit 1
 fi
-cd ..
-
-#
-# Build the reverse proxy's custom dockerfile
-#
-cd reverse-proxy
-docker build --no-cache -f Dockerfile -t custom_kong:2.6.0-alpine .
-if [ $? -ne 0 ]; then
-  echo "Problem encountered building the Reverse Proxy Docker file"
-  exit 1
-fi
-cd ..
-
