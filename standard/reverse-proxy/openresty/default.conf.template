@@ -27,8 +27,9 @@ server {
         resolver 127.0.0.11;
 
         rewrite_by_lua_block {
-            
+
             -- First run the OAuth Proxy plugin to translate secure cookies to opaque access tokens
+            local oauthProxy = require 'resty.oauth-proxy'
             local oauthProxyConfig = {
                 cookie_name_prefix = 'example',
                 encryption_key = '$ENCRYPTION_KEY',
@@ -37,10 +38,10 @@ server {
                 },
                 cors_enabled = true
             }
-            local oauthProxy = require 'resty.oauth-proxy'
             oauthProxy.run(oauthProxyConfig)
 
             -- Then run the Phantom Token plugin to translate opaque access tokens to JWT access tokens
+            local phantomToken = require 'resty.phantom-token'
             local phantomTokenConfig = {
                 introspection_endpoint = '$INTROSPECTION_ENDPOINT',
                 client_id = 'api-gateway-client',
@@ -48,8 +49,7 @@ server {
                 cache_name = 'phantom-token',
                 time_to_live_seconds = 900
             }
-            local phantomToken = require 'resty.phantom-token'
-            phantomToken.run(phantomTokenConfig)
+            phantomToken.execute(phantomTokenConfig)
         }
 
         # Then forward the JWT to the below API
