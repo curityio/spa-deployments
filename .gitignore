@@ -1,11 +1,10 @@
 license.json
-oauth-agent
-oauth-proxy-plugin
-kong-phantom-token-plugin
-financial/certs/example*
-financial/certs/extensions.cnf
 .DS_Store
+oauth-agent
+certs/example*
+certs/extensions.cnf
 kong.yml
+default.conf
 config.json
 encryption.key
 metadata.json
