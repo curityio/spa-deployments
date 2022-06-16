@@ -81,6 +81,9 @@ if [ "$SCENARIO" == 'standard' ]; then
     exit 1
   fi
   cd oauth-agent
+  
+  # TODO: delete after merge
+  git checkout feature/error_improvements
 
   npm install
   if [ $? -ne 0 ]; then
@@ -109,6 +112,9 @@ else
     exit 1
   fi
   cd oauth-agent
+
+  # TODO: delete after merge
+  git checkout feature/error_improvements
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
