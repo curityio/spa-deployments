@@ -81,7 +81,7 @@ if [ "$SCENARIO" == 'standard' ]; then
     exit 1
   fi
   cd oauth-agent
-
+  
   npm install
   if [ $? -ne 0 ]; then
     echo "Problem encountered installing the OAuth Agent dependencies"
