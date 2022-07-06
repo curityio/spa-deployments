@@ -82,9 +82,6 @@ if [ "$SCENARIO" == 'standard' ]; then
   fi
   cd oauth-agent
   
-  # TODO: delete after merge
-  git checkout feature/error_improvements
-
   npm install
   if [ $? -ne 0 ]; then
     echo "Problem encountered installing the OAuth Agent dependencies"
@@ -112,9 +109,6 @@ else
     exit 1
   fi
   cd oauth-agent
-
-  # TODO: delete after merge
-  git checkout feature/error_improvements
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
