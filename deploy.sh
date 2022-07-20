@@ -10,20 +10,29 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 #
-# First check prerequisites
+# Check for a license file
 #
 if [ ! -f './components/idsvr/license.json' ]; then
   echo "Please provide a license.json file in the components/idsvr folder in order to deploy the system"
   exit 1
 fi
-envsubst -V
-if [ $? -ne 0 ]; then
-  echo "Problem encountered running the envsubst command, please ensure that this tool is installed"
-  exit 1
-fi
+
+#
+# Check that helper tools are installed
+#
 jq -V
 if [ $? -ne 0 ]; then
-  echo "Problem encountered running the jq command, please ensure that this tool is installed"
+  echo "Problem encountered running the jq command: please ensure that this tool is installed"
+  exit 1
+fi
+envsubst -V
+if [ $? -ne 0 ]; then
+  echo "Problem encountered running the envsubst command: please ensure that this tool is installed"
+  exit 1
+fi
+openssl version
+if [ $? -ne 0 ]; then
+  echo "Problem encountered running the openssl command: please ensure that this tool is installed"
   exit 1
 fi
 
