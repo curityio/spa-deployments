@@ -16,6 +16,16 @@ if [ ! -f './components/idsvr/license.json' ]; then
   echo "Please provide a license.json file in the components/idsvr folder in order to deploy the system"
   exit 1
 fi
+envsubst -V
+if [ $? -ne 0 ]; then
+  echo "Problem encountered running the envsubst command, please ensure that this tool is installed"
+  exit 1
+fi
+jq -V
+if [ $? -ne 0 ]; then
+  echo "Problem encountered running the jq command, please ensure that this tool is installed"
+  exit 1
+fi
 
 #
 # Get the scenario to deploy and set some variables
