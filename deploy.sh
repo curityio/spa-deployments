@@ -68,7 +68,7 @@ fi
 
 #
 # These variables are passed in from the parent deploy.sh script in the spa-using-token-handler repo
-# When not supplied, set default valus so that this repo can be run in isolation
+# When not supplied, set default values so that this repo can be run in isolation
 #
 if [ "$BASE_DOMAIN" == "" ]; then
   BASE_DOMAIN='example.com'
