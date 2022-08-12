@@ -42,7 +42,7 @@ cd components/reverse-proxy
 if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 
   # Use NGINX if specified on the command line
-  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.21.3-alpine .
+  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.21.6-alpine .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the NGINX Reverse Proxy Docker file"
     exit 1

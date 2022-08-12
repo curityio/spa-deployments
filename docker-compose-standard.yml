@@ -72,7 +72,7 @@ services:
   # Use NGINX and C modules
   #
   nginx_reverse-proxy:
-    image: custom_nginx:1.21.3-alpine
+    image: custom_nginx:1.21.6-alpine
     hostname: reverseproxy
     ports:
       - 3000:3000
