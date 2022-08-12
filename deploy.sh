@@ -20,17 +20,17 @@ fi
 #
 # Check that helper tools are installed
 #
-jq -V
+jq -V 1>/dev/null
 if [ $? -ne 0 ]; then
   echo "Problem encountered running the jq command: please ensure that this tool is installed"
   exit 1
 fi
-envsubst -V
+envsubst -V 1>/dev/null
 if [ $? -ne 0 ]; then
   echo "Problem encountered running the envsubst command: please ensure that this tool is installed"
   exit 1
 fi
-openssl version
+openssl version 1>/dev/null
 if [ $? -ne 0 ]; then
   echo "Problem encountered running the openssl command: please ensure that this tool is installed"
   exit 1
@@ -67,23 +67,34 @@ else
 fi
 
 #
-# These variables must be passed in from the parent script in the spa-using-token-handler repo
+# These variables are passed in from the parent deploy.sh script in the spa-using-token-handler repo
+# When not supplied, set default values so that this repo can be run in isolation
 #
 if [ "$BASE_DOMAIN" == "" ]; then
-  echo "No BASE_DOMAIN environment variable was supplied"
-  exit 1
+  BASE_DOMAIN='example.com'
+  WEB_SUBDOMAIN='www'
 fi
 if [ "$API_SUBDOMAIN" == "" ]; then
-  echo "No API_SUBDOMAIN environment variable was supplied"
-  exit 1
+  API_SUBDOMAIN='api'
 fi
 if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
-  echo "No identity server domain was supplied in an environment variable"
+  IDSVR_SUBDOMAIN='login'
+fi
+
+#
+# Check that the parent build script has been run at least once, so that application level containers are available
+#
+if [ "$(docker images -q webhost:1.0.0)" == '' ]; then
+  echo 'The Docker image for webhost was not found - please ensure that you have run the build.sh script from the spa-using-token-handler repo'
+  exit 1
+fi
+if [ "$(docker images -q business-api:1.0.0)" == '' ]; then
+  echo 'The Docker image for business-api was not found - please ensure that you have run the build.sh script from the spa-using-token-handler repo'
   exit 1
 fi
 
 #
-# Set default domain details
+# Set final domain details
 #
 WEB_DOMAIN=$BASE_DOMAIN
 if [ "$WEB_SUBDOMAIN" != "" ]; then
