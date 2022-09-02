@@ -16,6 +16,24 @@ IDENTITY_SERVER_TLS_NAME='Identity_Server_TLS'
 PRIVATE_KEY_PASSWORD='Password1'
 
 #
+# Get platform specific differences
+#
+case "$(uname -s)" in
+
+  Linux)
+    LINE_SEPARATOR='\n'
+	;;
+  
+  Darwin)
+    LINE_SEPARATOR='\n'
+ 	;;
+
+  MINGW64*)
+    LINE_SEPARATOR='\r\n'
+	;;
+esac
+
+#
 # Wait for the admin endpoint to become available
 #
 echo "Waiting for the Curity Identity Server ..."
@@ -26,7 +44,7 @@ done
 #
 # Add the SSL key and use the private key password to protect it in transit
 #
-export IDENTITY_SERVER_TLS_DATA=$(openssl base64 -in ./certs/example.server.p12 | tr -d '\n')
+export IDENTITY_SERVER_TLS_DATA=$(openssl base64 -in ./certs/example.server.p12 | tr -d "$LINE_SEPARATOR")
 echo "Updating SSL certificate ..."
 HTTP_STATUS=$(curl -k -s \
 -X POST "$RESTCONF_BASE_URL/base:facilities/crypto/add-ssl-server-keystore" \
