@@ -148,5 +148,4 @@ openssl pkcs12 \
 #
 rm example.server.csr
 rm example.client.csr
-rm example*.srl
 echo '*** Successfully created all certificate files'
