@@ -37,6 +37,24 @@ if [ $? -ne 0 ]; then
 fi
 
 #
+# Get platform specific differences
+#
+case "$(uname -s)" in
+
+  Linux)
+    LINE_SEPARATOR='\n'
+	;;
+  
+  Darwin)
+    LINE_SEPARATOR='\n'
+ 	;;
+
+  MINGW64*)
+    LINE_SEPARATOR='\r\n'
+	;;
+esac
+
+#
 # Get the scenario to deploy and set some variables
 #
 if [ "$1" == 'financial' ]; then
@@ -201,7 +219,7 @@ if [ "$SCENARIO" == 'financial' ]; then
       exit 1
     fi
   fi
-  export FINANCIAL_GRADE_CLIENT_CA=$(openssl base64 -in './certs/example.ca.pem' | tr -d '\n')
+  export FINANCIAL_GRADE_CLIENT_CA=$(openssl base64 -in './certs/example.ca.pem' | tr -d "$LINE_SEPARATOR")
 fi
 
 #
