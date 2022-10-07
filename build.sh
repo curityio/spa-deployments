@@ -115,6 +115,11 @@ else
   fi
   cd oauth-agent
 
+  #
+  # TODO: delete after merging
+  #
+  git checkout feature/same-origin
+
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OAuth Agent's Java code"

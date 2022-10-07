@@ -177,21 +177,12 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 # Disable CORS when web content and token handler are hosted in the same domain
 #
-if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
-
-  if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
-     CORS_ENABLED='off'
-  else
-     CORS_ENABLED='on'
-  fi
-
+if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
+  CORS_ENABLED='false'
+  CORS_ENABLED_NGINX='off'
 else
-
-  if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
-     CORS_ENABLED='false'
-  else
-     CORS_ENABLED='true'
-  fi
+  CORS_ENABLED='true'
+  CORS_ENABLED_NGINX='on'
 fi
 
 #
@@ -217,6 +208,7 @@ export ENCRYPTION_KEY
 export SSL_CERT_FILE_PATH
 export SSL_CERT_PASSWORD
 export CORS_ENABLED
+export CORS_ENABLED_NGINX
 
 #
 # Create certificates when deploying the financial grade scenario
