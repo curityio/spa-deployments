@@ -93,7 +93,7 @@ if [ "$BASE_DOMAIN" == "" ]; then
   WEB_SUBDOMAIN='www'
 fi
 if [ "$API_SUBDOMAIN" == "" ]; then
-  API_SUBDOMAIN='api'
+  API_SUBDOMAIN='www'
 fi
 if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   IDSVR_SUBDOMAIN='login'
@@ -175,6 +175,26 @@ ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
 
 #
+# Disable CORS when web content and token handler are hosted in the same domain
+#
+if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
+
+  if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
+     CORS_ENABLED='off'
+  else
+     CORS_ENABLED='on'
+  fi
+
+else
+
+  if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
+     CORS_ENABLED='false'
+  else
+     CORS_ENABLED='true'
+  fi
+fi
+
+#
 # Export variables needed for substitution and deployment
 #
 export SCHEME
@@ -196,15 +216,7 @@ export LOGOUT_ENDPOINT
 export ENCRYPTION_KEY
 export SSL_CERT_FILE_PATH
 export SSL_CERT_PASSWORD
-
-#
-# Update template files with the encryption key and other supplied environment variables
-#
-cd components
-envsubst < ./spa/config-template.json     > ./spa/config.json
-envsubst < ./webhost/config-template.json > ./webhost/config.json
-envsubst < ./api/config-template.json     > ./api/config.json
-cd ..
+export CORS_ENABLED
 
 #
 # Create certificates when deploying the financial grade scenario
@@ -223,9 +235,17 @@ if [ "$SCENARIO" == 'financial' ]; then
 fi
 
 #
+# Update template files with the encryption key and other supplied environment variables
+#
+cd components
+envsubst < ./spa/config-template.json     > ./spa/config.json
+envsubst < ./webhost/config-template.json > ./webhost/config.json
+envsubst < ./api/config-template.json     > ./api/config.json
+
+#
 # Update the reverse proxy configuration with runtime values, including the cookie encryption key
 #
-cd components/reverse-proxy
+cd reverse-proxy
 if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 
   # Use NGINX if specified on the command line

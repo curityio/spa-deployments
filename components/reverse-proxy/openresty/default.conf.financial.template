@@ -45,7 +45,7 @@ server {
                 trusted_web_origins = {
                     '$SCHEME://$WEB_DOMAIN'
                 },
-                cors_enabled = true
+                cors_enabled = $CORS_ENABLED
             }
             oauthProxy.run(oauthProxyConfig)
 

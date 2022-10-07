@@ -42,7 +42,7 @@ services:
       encryption_key: $ENCRYPTION_KEY
       trusted_web_origins:
       - $SCHEME://$WEB_DOMAIN
-      cors_enabled: true
+      cors_enabled: $CORS_ENABLED
   
   # 2. The phantom token plugin will run after the secure cookie plugin, to introspect tokens
   - name: phantom-token
