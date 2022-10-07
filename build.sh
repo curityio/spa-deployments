@@ -81,6 +81,11 @@ if [ "$SCENARIO" == 'standard' ]; then
     exit 1
   fi
   cd oauth-agent
+
+  #
+  # TODO: delete after merging
+  #
+  git checkout feature/same-origin
   
   npm install
   if [ $? -ne 0 ]; then

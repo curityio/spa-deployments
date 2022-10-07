@@ -67,6 +67,7 @@ services:
       COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
+      CORS_ENABLED: '${CORS_ENABLED}'
     command: >
       sh -c "/usr/lib/jvm/zulu11-ca/bin/keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
              su apiuser &&

@@ -46,6 +46,7 @@ services:
       COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
+      CORS_ENABLED: '${CORS_ENABLED}'
 
   #
   # Use Kong and LUA plugins
