@@ -93,7 +93,7 @@ if [ "$BASE_DOMAIN" == "" ]; then
   WEB_SUBDOMAIN='www'
 fi
 if [ "$API_SUBDOMAIN" == "" ]; then
-  API_SUBDOMAIN='www'
+  API_SUBDOMAIN='api'
 fi
 if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   IDSVR_SUBDOMAIN='login'
