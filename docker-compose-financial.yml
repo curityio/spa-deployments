@@ -6,9 +6,7 @@ services:
   #
   webhost:
     image: webhost:1.0.0
-    hostname: webhost
-    ports:
-      - 443:3000
+    hostname: webhost-${INTERNAL_DOMAIN}
     volumes:
       - ./components/webhost/config.json:/usr/webhost/config.json
       - ./components/spa/config.json:/usr/webhost/content/config.json
@@ -67,6 +65,7 @@ services:
       COOKIE_DOMAIN: '${API_DOMAIN}'
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
+      CORS_ENABLED: '${CORS_ENABLED}'
     command: >
       sh -c "/usr/lib/jvm/zulu11-ca/bin/keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
              su apiuser &&
@@ -80,7 +79,7 @@ services:
     image: custom_kong:2.6.0-alpine
     hostname: reverseproxy
     ports:
-      - 3000:3000
+      - 443:3000
     volumes:
       - ./components/reverse-proxy/kong/kong.yml:/usr/local/kong/declarative/kong.yml
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
@@ -105,7 +104,7 @@ services:
     image: custom_nginx:1.21.6-alpine
     hostname: reverseproxy
     ports:
-      - 3000:3000
+      - 443:3000
     volumes:
       - ./components/reverse-proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./components/reverse-proxy/nginx/default.conf:/etc/nginx/templates/default.conf.template
@@ -122,7 +121,7 @@ services:
     image: custom_openresty/openresty:1.19.9.1-2-bionic
     hostname: reverseproxy
     ports:
-      - 3000:3000
+      - 443:3000
     volumes:
       - ./components/reverse-proxy/openresty/default.conf:/etc/nginx/conf.d/default.conf
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
@@ -150,7 +149,7 @@ services:
   # A standalone instance of the Curity Identity Server
   #
   curity-idsvr:
-    image: curity.azurecr.io/curity/idsvr:7.2.0
+    image: curity.azurecr.io/curity/idsvr:7.4.0
     hostname: login-${INTERNAL_DOMAIN}
     ports:
       - 6749:6749

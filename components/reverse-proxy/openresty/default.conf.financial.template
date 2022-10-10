@@ -13,8 +13,12 @@ server {
     lua_ssl_trusted_certificate /usr/local/share/certs/example.ca.pem;
 
     location / {
-        root   /usr/share/nginx/html;
-        index  index.html index.htm;
+        
+        # Use the Docker embedded DNS server
+        resolver 127.0.0.11;
+        
+        # Route directly to web static content
+        proxy_pass $SCHEME://webhost-$INTERNAL_DOMAIN:3000/;
     }
 
     location /oauth-agent {
@@ -41,7 +45,7 @@ server {
                 trusted_web_origins = {
                     '$SCHEME://$WEB_DOMAIN'
                 },
-                cors_enabled = true
+                cors_enabled = $CORS_ENABLED
             }
             oauthProxy.run(oauthProxyConfig)
 

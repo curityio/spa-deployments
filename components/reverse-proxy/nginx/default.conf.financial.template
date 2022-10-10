@@ -13,8 +13,12 @@ server {
     ssl_trusted_certificate /usr/local/share/certs/example.ca.pem;
 
     location / {
-        root   /usr/share/nginx/html;
-        index  index.html index.htm;
+        
+        # Use the Docker embedded DNS server
+        resolver 127.0.0.11;
+        
+        # Route directly to web static content
+        proxy_pass $SCHEME://webhost-$INTERNAL_DOMAIN:3000/;
     }
 
     location /oauth-agent {
@@ -36,7 +40,7 @@ server {
         oauth_proxy_cookie_name_prefix example;
         oauth_proxy_encryption_key $ENCRYPTION_KEY;
         oauth_proxy_trusted_web_origin $SCHEME://$WEB_DOMAIN;
-        oauth_proxy_cors_enabled on;
+        oauth_proxy_cors_enabled $CORS_ENABLED_NGINX;
 
         # Then run the Phantom Token plugin to translate opaque access tokens to JWT access tokens
         phantom_token on;

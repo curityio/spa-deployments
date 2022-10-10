@@ -86,16 +86,12 @@ fi
 
 #
 # These variables are passed in from the parent deploy.sh script in the spa-using-token-handler repo
-# When not supplied, set default values so that this repo can be run in isolation
+# When not supplied, set default values so that the spa-deployments repo can be tested in isolation
 #
 if [ "$BASE_DOMAIN" == "" ]; then
   BASE_DOMAIN='example.com'
   WEB_SUBDOMAIN='www'
-fi
-if [ "$API_SUBDOMAIN" == "" ]; then
   API_SUBDOMAIN='api'
-fi
-if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   IDSVR_SUBDOMAIN='login'
 fi
 
@@ -112,14 +108,20 @@ if [ "$(docker images -q business-api:1.0.0)" == '' ]; then
 fi
 
 #
-# Set final domain details
+# Set full domain paths
 #
 WEB_DOMAIN=$BASE_DOMAIN
 if [ "$WEB_SUBDOMAIN" != "" ]; then
   WEB_DOMAIN="$WEB_SUBDOMAIN.$BASE_DOMAIN"
 fi
-API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
-IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
+API_DOMAIN=$BASE_DOMAIN
+if [ "$API_SUBDOMAIN" != "" ]; then
+  API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
+fi
+IDSVR_DOMAIN=$BASE_DOMAIN
+if [ "$IDSVR_SUBDOMAIN" != "" ]; then
+  IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
+fi
 INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 
 #
@@ -153,7 +155,7 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
 else
 
   # Deploy a Docker based identity server
-  IDSVR_BASE_URL="$SCHEME://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
+  IDSVR_BASE_URL="$SCHEME://$IDSVR_DOMAIN:8443"
   IDSVR_INTERNAL_BASE_URL="$SCHEME://login-$INTERNAL_DOMAIN:8443"
   IDSVR_PROFILE='WITH_IDSVR'
 
@@ -173,6 +175,17 @@ fi
 #
 ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
 echo -n $ENCRYPTION_KEY > encryption.key
+
+#
+# Disable CORS when web content and token handler are hosted in the same domain
+#
+if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
+  CORS_ENABLED='false'
+  CORS_ENABLED_NGINX='off'
+else
+  CORS_ENABLED='true'
+  CORS_ENABLED_NGINX='on'
+fi
 
 #
 # Export variables needed for substitution and deployment
@@ -196,15 +209,8 @@ export LOGOUT_ENDPOINT
 export ENCRYPTION_KEY
 export SSL_CERT_FILE_PATH
 export SSL_CERT_PASSWORD
-
-#
-# Update template files with the encryption key and other supplied environment variables
-#
-cd components
-envsubst < ./spa/config-template.json     > ./spa/config.json
-envsubst < ./webhost/config-template.json > ./webhost/config.json
-envsubst < ./api/config-template.json     > ./api/config.json
-cd ..
+export CORS_ENABLED
+export CORS_ENABLED_NGINX
 
 #
 # Create certificates when deploying the financial grade scenario
@@ -223,9 +229,17 @@ if [ "$SCENARIO" == 'financial' ]; then
 fi
 
 #
+# Update template files with the encryption key and other supplied environment variables
+#
+cd components
+envsubst < ./spa/config-template.json     > ./spa/config.json
+envsubst < ./webhost/config-template.json > ./webhost/config.json
+envsubst < ./api/config-template.json     > ./api/config.json
+
+#
 # Update the reverse proxy configuration with runtime values, including the cookie encryption key
 #
-cd components/reverse-proxy
+cd reverse-proxy
 if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 
   # Use NGINX if specified on the command line
