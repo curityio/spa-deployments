@@ -86,14 +86,12 @@ fi
 
 #
 # These variables are passed in from the parent deploy.sh script in the spa-using-token-handler repo
-# When not supplied, set default values so that this repo can be run in isolation
+# When not supplied, set default values so that the spa-deployments repo can be tested in isolation
 #
 if [ "$BASE_DOMAIN" == "" ]; then
   BASE_DOMAIN='example.com'
   WEB_SUBDOMAIN='www'
   API_SUBDOMAIN='api'
-fi
-if [ "$IDSVR_SUBDOMAIN" == "" ] && [ "$EXTERNAL_IDSVR_ISSUER_URI" == "" ]; then
   IDSVR_SUBDOMAIN='login'
 fi
 
@@ -110,7 +108,7 @@ if [ "$(docker images -q business-api:1.0.0)" == '' ]; then
 fi
 
 #
-# Set final domain details
+# Set full domain paths
 #
 WEB_DOMAIN=$BASE_DOMAIN
 if [ "$WEB_SUBDOMAIN" != "" ]; then
@@ -120,7 +118,10 @@ API_DOMAIN=$BASE_DOMAIN
 if [ "$API_SUBDOMAIN" != "" ]; then
   API_DOMAIN="$API_SUBDOMAIN.$BASE_DOMAIN"
 fi
-IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
+IDSVR_DOMAIN=$BASE_DOMAIN
+if [ "$IDSVR_SUBDOMAIN" != "" ]; then
+  IDSVR_DOMAIN="$IDSVR_SUBDOMAIN.$BASE_DOMAIN"
+fi
 INTERNAL_DOMAIN="internal.$BASE_DOMAIN"
 
 #
@@ -154,7 +155,7 @@ if [ "$EXTERNAL_IDSVR_ISSUER_URI" != "" ]; then
 else
 
   # Deploy a Docker based identity server
-  IDSVR_BASE_URL="$SCHEME://$IDSVR_SUBDOMAIN.$BASE_DOMAIN:8443"
+  IDSVR_BASE_URL="$SCHEME://$IDSVR_DOMAIN:8443"
   IDSVR_INTERNAL_BASE_URL="$SCHEME://login-$INTERNAL_DOMAIN:8443"
   IDSVR_PROFILE='WITH_IDSVR'
 
