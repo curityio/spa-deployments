@@ -94,6 +94,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: './usr/local/share/certs/example.ca.pem'
       KONG_LOG_LEVEL: 'info'
       KONG_PLUGINS: 'bundled,oauth-proxy,phantom-token'
+
     profiles:
       - KONG
 
