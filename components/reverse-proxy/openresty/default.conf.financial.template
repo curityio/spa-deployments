@@ -56,9 +56,9 @@ server {
                 client_id = 'api-gateway-client',
                 client_secret = 'Password1',
                 cache_name = 'phantom-token',
-                time_to_live_seconds = 900
+                token_cache_seconds = 900
             }
-            phantomToken.execute(phantomTokenConfig)
+            phantomToken.run(phantomTokenConfig)
         }
 
         # Then forward the JWT to the below API

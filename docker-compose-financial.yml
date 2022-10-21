@@ -76,7 +76,7 @@ services:
   # The reverse proxy routes to the OAuth Agent and the business API inside the cluster
   #
   kong_reverse-proxy:
-    image: custom_kong:2.6.0-alpine
+    image: custom_kong:3.0.0
     hostname: reverseproxy
     ports:
       - 443:3000
@@ -94,7 +94,7 @@ services:
       KONG_LUA_SSL_TRUSTED_CERTIFICATE: './usr/local/share/certs/example.ca.pem'
       KONG_LOG_LEVEL: 'info'
       KONG_PLUGINS: 'bundled,oauth-proxy,phantom-token'
-
+      KONG_NGINX_HTTP_LUA_SHARED_DICT: 'phantom-token 10m'
     profiles:
       - KONG
 
@@ -119,7 +119,7 @@ services:
   # Use OpenResty and LUA plugins
   #
   openresty_reverse-proxy:
-    image: custom_openresty/openresty:1.19.9.1-2-bionic
+    image: custom_openresty/openresty:1.21.4.1-bionic
     hostname: reverseproxy
     ports:
       - 443:3000

@@ -51,5 +51,3 @@ services:
       client_id: api-gateway-client
       client_secret: Password1
       token_cache_seconds: 900
-      trusted_web_origins:
-      - $SCHEME://$WEB_DOMAIN
