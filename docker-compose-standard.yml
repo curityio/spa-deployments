@@ -52,7 +52,7 @@ services:
   # Use Kong and LUA plugins
   #
   kong_reverse-proxy:
-    image: custom_kong:2.6.0-alpine
+    image: custom_kong:3.0.0
     hostname: reverseproxy
     ports:
       - 80:3000
@@ -64,6 +64,7 @@ services:
       KONG_PROXY_LISTEN: '0.0.0.0:3000'
       KONG_LOG_LEVEL: 'info'
       KONG_PLUGINS: 'bundled,oauth-proxy,phantom-token'
+      KONG_NGINX_HTTP_LUA_SHARED_DICT: 'phantom-token 10m'
     profiles:
       - KONG
 
@@ -85,7 +86,7 @@ services:
   # Use OpenResty and LUA plugins
   #
   openresty_reverse-proxy:
-    image: custom_openresty/openresty:1.19.9.1-2-bionic
+    image: custom_openresty/openresty:1.21.4.1-bionic
     hostname: reverseproxy
     ports:
       - 80:3000

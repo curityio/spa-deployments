@@ -51,7 +51,7 @@ if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
 elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
 
   # Use OpenResty if specified on the command line
-  docker build --no-cache -f openresty/Dockerfile -t custom_openresty/openresty:1.19.9.1-2-bionic .
+  docker build --no-cache -f openresty/Dockerfile -t custom_openresty/openresty:1.21.4.1-bionic .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OpenResty Reverse Proxy Docker file"
     exit 1
@@ -60,7 +60,7 @@ elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
 else
   
   # Use Kong by default
-  docker build --no-cache -f kong/Dockerfile -t custom_kong:2.6.0-alpine .
+  docker build --no-cache -f kong/Dockerfile -t custom_kong:3.0.0 .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the Kong Reverse Proxy Docker file"
     exit 1
