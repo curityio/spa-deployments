@@ -17,7 +17,7 @@ services:
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
   # It runs on port 3002 inside the cluster at https://api.internal-example.com:3002
-  # The SPA accesses it via the reverse proxy at https://api.example.com:3000/api
+  # The SPA accesses it via the API gateway at https://api.example.com:3000/api
   # The API calls the Authorization Server's JWKS endpoint inside the cluster
   #
   business-api:
@@ -33,11 +33,11 @@ services:
   #
   # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
   # It runs on port 3001 inside the cluster at https://oauthagent.internal-example.com:3001
-  # The SPA accesses it via the reverse proxy at https://api.example.com:3000/oauth-agent
+  # The SPA accesses it via the API gateway at https://api.example.com:3000/oauth-agent
   # The OAuth Agent calls the Authorization Server's token endpoint inside the cluster
   #
   oauth-agent:
-    image: oauthagent-financial:1.0.0
+    image: oauthagent:1.0.0
     hostname: oauthagent-${INTERNAL_DOMAIN}
     volumes:
       - ./certs/example.ca.pem:/usr/api/certs/example.ca.pem
@@ -72,16 +72,16 @@ services:
              java -jar /usr/api/oauth-agent-0.0.1-SNAPSHOT.jar"
     
   #
-  # The Kong reverse proxy exposes API endpoints to the browser at https://api.example.com:3000
-  # The reverse proxy routes to the OAuth Agent and the business API inside the cluster
+  # The Kong API gateway exposes API endpoints to the browser at https://api.example.com:3000
+  # The API gateway routes to the OAuth Agent and the business API inside the cluster
   #
-  kong_reverse-proxy:
+  kong-api-gateway:
     image: custom_kong:3.0.0
-    hostname: reverseproxy
+    hostname: apigateway
     ports:
       - 443:3000
     volumes:
-      - ./components/reverse-proxy/kong/kong.yml:/usr/local/kong/declarative/kong.yml
+      - ./components/api-gateway/kong/kong.yml:/usr/local/kong/declarative/kong.yml
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
@@ -101,14 +101,14 @@ services:
   #
   # Use NGINX and C modules
   #
-  nginx_reverse-proxy:
+  nginx-api-gateway:
     image: custom_nginx:1.21.6-alpine
-    hostname: reverseproxy
+    hostname: apigateway
     ports:
       - 443:3000
     volumes:
-      - ./components/reverse-proxy/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./components/reverse-proxy/nginx/default.conf:/etc/nginx/templates/default.conf.template
+      - ./components/api-gateway/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./components/api-gateway/nginx/default.conf:/etc/nginx/templates/default.conf.template
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
@@ -118,13 +118,13 @@ services:
   #
   # Use OpenResty and LUA plugins
   #
-  openresty_reverse-proxy:
+  openresty-api-gateway:
     image: custom_openresty/openresty:1.21.4.1-bionic
-    hostname: reverseproxy
+    hostname: apigateway
     ports:
       - 443:3000
     volumes:
-      - ./components/reverse-proxy/openresty/default.conf:/etc/nginx/conf.d/default.conf
+      - ./components/api-gateway/openresty/default.conf:/etc/nginx/conf.d/default.conf
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
@@ -150,7 +150,7 @@ services:
   # A standalone instance of the Curity Identity Server
   #
   curity-idsvr:
-    image: curity.azurecr.io/curity/idsvr:7.4.0
+    image: curity.azurecr.io/curity/idsvr:7.6.0
     hostname: login-${INTERNAL_DOMAIN}
     ports:
       - 6749:6749
@@ -160,7 +160,6 @@ services:
     volumes:
       - ./components/idsvr/license.json:/opt/idsvr/etc/init/license/license.json
       - ./components/idsvr/config-backup-financial.xml:/opt/idsvr/etc/init/config.xml
-      - ./components/idsvr/log4j2.xml:/opt/idsvr/etc/log4j2.xml
     environment:
       PASSWORD: 'Password1'
       FINANCIAL_GRADE_CLIENT_CA: "${FINANCIAL_GRADE_CLIENT_CA}"
