@@ -229,7 +229,7 @@ export CORS_ENABLED_NGINX
 # Create certificates when deploying a financial grade setup
 # Also set a variable passed through to components/idsvr/config-backup-financial.xml
 #
-if [ "$OAUTH_AGENT" == 'financial' ]; then
+if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
 
   if [ ! -f './certs/example.ca.pem' ]; then
     ./certs/create-certs.sh

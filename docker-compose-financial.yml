@@ -13,6 +13,8 @@ services:
       - ./certs/example.server.p12:/usr/webhost/certs/example.server.p12
     environment:
       NODE_ENV: 'production'
+    profiles:
+      - NONE
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
@@ -29,6 +31,8 @@ services:
       - ./certs/example.server.p12:/usr/api/certs/example.server.p12
     environment:
       NODE_EXTRA_CA_CERTS: '/usr/api/certs/example.ca.pem'
+    profiles:
+      - NONE
 
   #
   # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
@@ -67,10 +71,10 @@ services:
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
       CORS_ENABLED: '${CORS_ENABLED}'
     command: >
-      sh -c "/usr/lib/jvm/zulu11-ca/bin/keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
+      sh -c "keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
              su apiuser &&
              java -jar /usr/api/oauth-agent-0.0.1-SNAPSHOT.jar"
-    
+
   #
   # The Kong API gateway exposes API endpoints to the browser at https://api.example.com:3000
   # The API gateway routes to the OAuth Agent and the business API inside the cluster
@@ -96,7 +100,8 @@ services:
       KONG_PLUGINS: 'bundled,oauth-proxy,phantom-token'
       KONG_NGINX_HTTP_LUA_SHARED_DICT: 'phantom-token 10m'
     profiles:
-      - KONG
+      - NONE
+      #- KONG
 
   #
   # Use NGINX and C modules
@@ -113,7 +118,8 @@ services:
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
     profiles:
-      - NGINX
+      # - NGINX
+      - NONE
 
   #
   # Use OpenResty and LUA plugins
@@ -129,7 +135,8 @@ services:
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
     profiles:
-      - OPENRESTY
+      #- OPENRESTY
+      - NONE
 
   #
   # A SQL database used by the Curity Identity Server
@@ -145,6 +152,8 @@ services:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'Password1'
       POSTGRES_DB: 'idsvr'
+    profiles:
+      - NONE
 
   #
   # A standalone instance of the Curity Identity Server
@@ -166,4 +175,6 @@ services:
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
       BASE_DOMAIN: "${BASE_DOMAIN}"
-      LOGGING_LEVEL: 'DEBUG'
+      LOGGING_LEVEL: 'INFO'
+    profiles:
+      - NONE

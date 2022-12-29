@@ -144,8 +144,16 @@ openssl pkcs12 \
     -passout pass:$TRUSTSTORE_PASSWORD
 
 #
+# Ensure that certificate files are readable, if OpenSSL 3 is used
+#
+chmod 644 example.ca.*
+chmod 644 example.server.*
+chmod 644 example.client.*
+
+#
 # Remove files we no longer need
 #
 rm example.server.csr
 rm example.client.csr
 echo '*** Successfully created all certificate files'
+oauthagent-internal

@@ -40,6 +40,7 @@ services:
       USERINFO_ENDPOINT: '${USERINFO_ENDPOINT}'
       LOGOUT_ENDPOINT: '${LOGOUT_ENDPOINT}'
       CLIENT_ID: 'spa-client'
+      CLIENT_SECRET: 'Password1'
       REDIRECT_URI: 'http://${WEB_DOMAIN}/'
       POST_LOGOUT_REDIRECT_URI: 'http://${WEB_DOMAIN}/'
       SCOPE: 'openid profile'
@@ -47,6 +48,8 @@ services:
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
       CORS_ENABLED: '${CORS_ENABLED}'
+      SERVER_CERT_P12_PATH:
+      SERVER_CERT_P12_PASSWORD:
 
   #
   # Use Kong and LUA plugins
@@ -128,4 +131,4 @@ services:
       PASSWORD: 'Password1'
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
-      LOGGING_LEVEL: 'DEBUG'
+      LOGGING_LEVEL: 'INFO'
