@@ -13,8 +13,6 @@ services:
       - ./certs/example.server.p12:/usr/webhost/certs/example.server.p12
     environment:
       NODE_ENV: 'production'
-    profiles:
-      - NONE
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
@@ -31,8 +29,6 @@ services:
       - ./certs/example.server.p12:/usr/api/certs/example.server.p12
     environment:
       NODE_EXTRA_CA_CERTS: '/usr/api/certs/example.ca.pem'
-    profiles:
-      - NONE
 
   #
   # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
@@ -100,8 +96,7 @@ services:
       KONG_PLUGINS: 'bundled,oauth-proxy,phantom-token'
       KONG_NGINX_HTTP_LUA_SHARED_DICT: 'phantom-token 10m'
     profiles:
-      - NONE
-      #- KONG
+      - KONG
 
   #
   # Use NGINX and C modules
@@ -118,8 +113,7 @@ services:
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
     profiles:
-      # - NGINX
-      - NONE
+      - NGINX
 
   #
   # Use OpenResty and LUA plugins
@@ -135,8 +129,7 @@ services:
       - ./certs/example.server.key:/usr/local/share/certs/example.server.key
       - ./certs/example.server.pem:/usr/local/share/certs/example.server.pem
     profiles:
-      #- OPENRESTY
-      - NONE
+      - OPENRESTY
 
   #
   # A SQL database used by the Curity Identity Server
@@ -144,8 +137,6 @@ services:
   curity-data:
     image: postgres:13.2
     hostname: dbserver
-    profiles:
-      - WITH_IDSVR
     volumes:
       - ./components/idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
     environment:
@@ -153,8 +144,8 @@ services:
       POSTGRES_PASSWORD: 'Password1'
       POSTGRES_DB: 'idsvr'
     profiles:
-      - NONE
-
+      - WITH_IDSVR
+    
   #
   # A standalone instance of the Curity Identity Server
   #
@@ -164,8 +155,6 @@ services:
     ports:
       - 6749:6749
       - 8443:8443
-    profiles:
-      - WITH_IDSVR
     volumes:
       - ./components/idsvr/license.json:/opt/idsvr/etc/init/license/license.json
       - ./components/idsvr/config-backup-financial.xml:/opt/idsvr/etc/init/config.xml
@@ -177,4 +166,4 @@ services:
       BASE_DOMAIN: "${BASE_DOMAIN}"
       LOGGING_LEVEL: 'INFO'
     profiles:
-      - NONE
+      - WITH_IDSVR

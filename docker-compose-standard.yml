@@ -104,14 +104,14 @@ services:
   curity-data:
     image: postgres:13.2
     hostname: dbserver
-    profiles:
-      - WITH_IDSVR
     volumes:
       - ./components/idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
     environment:
       POSTGRES_USER: 'postgres'
       POSTGRES_PASSWORD: 'Password1'
       POSTGRES_DB: 'idsvr'
+    profiles:
+      - WITH_IDSVR
 
   #
   # A standalone instance of the Curity Identity Server
@@ -122,8 +122,6 @@ services:
     ports:
       - 6749:6749
       - 8443:8443
-    profiles:
-      - WITH_IDSVR
     volumes:
       - ./components/idsvr/license.json:/opt/idsvr/etc/init/license/license.json
       - ./components/idsvr/config-backup-standard.xml:/opt/idsvr/etc/init/config.xml
@@ -132,3 +130,5 @@ services:
       IDSVR_BASE_URL: "${IDSVR_BASE_URL}"
       WEB_DOMAIN: "${WEB_DOMAIN}"
       LOGGING_LEVEL: 'INFO'
+    profiles:
+      - WITH_IDSVR
