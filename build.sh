@@ -69,7 +69,7 @@ cd ..
 #
 # Get and build the OAuth Agent
 #
-rm -rf oauth-agent
+rm -rf oauth-agent 2>/dev/null
 if [ "$OAUTH_AGENT" == 'NODE' ]; then
 
   git clone https://github.com/curityio/oauth-agent-node-express oauth-agent
@@ -94,13 +94,7 @@ if [ "$OAUTH_AGENT" == 'NODE' ]; then
 
 elif [ "$OAUTH_AGENT" == 'NET' ]; then
 
-  echo '*** The OAuth agent for .NET is not ready yet'
-  exit 1
-
-elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
-
-  rm -rf oauth-agent
-  git clone https://github.com/curityio/oauth-agent-kotlin-spring oauth-agent
+  git clone https://github.com/curityio/oauth-agent-dotnet oauth-agent
   if [ $? -ne 0 ]; then
     echo "Problem encountered downloading the OAuth Agent"
     exit 1
@@ -108,9 +102,24 @@ elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
   cd oauth-agent
   git checkout dev
 
-  ./gradlew bootJar
+  dotnet publish oauth-agent.csproj -c Release -r linux-x64 --no-self-contained
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OAuth Agent's Java code"
+    exit 1
+  fi
+
+elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
+
+  git clone https://github.com/curityio/oauth-agent-kotlin-spring oauth-agent
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered downloading the OAuth Agent"
+    exit 1
+  fi
+  cd oauth-agent
+
+  ./gradlew bootJar
+  if [ $? -ne 0 ]; then
+    echo "Problem encountered building the OAuth Agent's Kotlin code"
     exit 1
   fi
 
@@ -126,12 +135,12 @@ elif [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
-    echo "Problem encountered building the OAuth Agent's Java code"
+    echo "Problem encountered building the OAuth Agent's Kotlin code"
     exit 1
   fi
 fi
-docker build -f Dockerfile -t oauthagent:1.0.0 .
+docker build -t oauthagent:1.0.0 .
 if [ $? -ne 0 ]; then
-  echo "Problem encountered building the OAuth Agent Docker file"
+  echo "Problem encountered building the OAuth Agent docker image"
   exit 1
 fi
