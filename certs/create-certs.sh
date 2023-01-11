@@ -156,4 +156,3 @@ chmod 644 example.client.*
 rm example.server.csr
 rm example.client.csr
 echo '*** Successfully created all certificate files'
-oauthagent-internal
