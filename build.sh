@@ -78,7 +78,6 @@ if [ "$OAUTH_AGENT" == 'NODE' ]; then
     exit 1
   fi
   cd oauth-agent
-  git checkout feature/pme-778-behaviors
 
   npm install
   if [ $? -ne 0 ]; then
@@ -100,7 +99,6 @@ elif [ "$OAUTH_AGENT" == 'NET' ]; then
     exit 1
   fi
   cd oauth-agent
-  git checkout dev
 
   dotnet publish oauth-agent.csproj -c Release -r linux-x64 --no-self-contained
   if [ $? -ne 0 ]; then
