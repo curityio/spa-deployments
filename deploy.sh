@@ -280,6 +280,6 @@ fi
 #
 # Configure Identity Server certificates when deploying the financial grade scenario
 #
-if [ "$OAUTH_PROXY" == 'FINANCIAL' ]; then
+if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   ./deploy-idsvr-certs.sh
 fi
