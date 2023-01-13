@@ -5,12 +5,8 @@
 proxy_cache_path cache levels=1:2 keys_zone=api_cache:10m max_size=10g inactive=60m use_temp_path=off;
 
 server {
-    server_name reverseproxy;
-    listen      3000 ssl;
-
-    ssl_certificate         /usr/local/share/certs/example.server.pem;
-    ssl_certificate_key     /usr/local/share/certs/example.server.key;
-    ssl_trusted_certificate /usr/local/share/certs/example.ca.pem;
+    server_name apigateway;
+    listen      3000;
 
     location / {
         

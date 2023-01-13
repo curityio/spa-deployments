@@ -1,8 +1,8 @@
 #!/bin/bash
 
-######################################################################
-# A script to deploy Token Handler resources for the standard scenario
-######################################################################
+########################################################################
+# A script to deploy Token Handler resources in a Docker compose network 
+########################################################################
 
 #
 # Ensure that we are in the folder containing this script
@@ -55,33 +55,45 @@ case "$(uname -s)" in
 esac
 
 #
-# Get the scenario to deploy and set some variables
+# Get the OAuth agent and default to Node.js
 #
-if [ "$1" == 'financial' ]; then
-  SCENARIO='financial'
+OAUTH_AGENT="$1"
+if [ "$OAUTH_AGENT" == '' ]; then
+  OAUTH_AGENT="NODE"
+fi
+if [ "$OAUTH_AGENT" != 'NODE' ] && [ "$OAUTH_AGENT" != 'NET' ] && [ "$OAUTH_AGENT" != 'KOTLIN' ] && [ "$OAUTH_AGENT" != 'FINANCIAL' ]; then
+  echo 'An invalid value was supplied for the OAUTH_AGENT parameter'
+  exit 1
+fi
+
+#
+# Get the API gateway and OAuth proxy plugin to use, and default to Kong
+#
+OAUTH_PROXY="$2"
+if [ "$OAUTH_PROXY" == '' ]; then
+  OAUTH_PROXY="KONG"
+fi
+if [ "$OAUTH_PROXY" != 'KONG' ] && [ "$OAUTH_PROXY" != 'NGINX' ] && [ "$OAUTH_PROXY" != 'OPENRESTY' ]; then
+  echo 'An invalid value was supplied for the OAUTH_PROXY parameter'
+  exit 1
+fi
+echo "Deploying resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API gateway and plugin ..."
+
+#
+# Set some properties differently for the more complex financial grade setup
+#
+if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   DOCKER_COMPOSE_FILE='docker-compose-financial.yml'
   SCHEME='https'
   SSL_CERT_FILE_PATH='./certs/example.server.p12'
   SSL_CERT_PASSWORD='Password1'
   NGINX_TEMPLATE_FILE_NAME='default.conf.financial.template'
 else
-  SCENARIO='standard'
   DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
   SCHEME='http'
   SSL_CERT_FILE_PATH=''
   SSL_CERT_PASSWORD=''
   NGINX_TEMPLATE_FILE_NAME='default.conf.standard.template'
-fi
-
-#
-# Different reverse proxies use different plugins and configuration techniques
-#
-if [ "$2" == 'nginx' ]; then
-  REVERSE_PROXY_PROFILE='NGINX'
-elif [ "$2" == 'openresty' ]; then
-  REVERSE_PROXY_PROFILE='OPENRESTY'
-else
-  REVERSE_PROXY_PROFILE='KONG'
 fi
 
 #
@@ -213,10 +225,10 @@ export CORS_ENABLED
 export CORS_ENABLED_NGINX
 
 #
-# Create certificates when deploying the financial grade scenario
+# Create certificates when deploying a financial grade setup
 # Also set a variable passed through to components/idsvr/config-backup-financial.xml
 #
-if [ "$SCENARIO" == 'financial' ]; then
+if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
 
   if [ ! -f './certs/example.ca.pem' ]; then
     ./certs/create-certs.sh
@@ -237,32 +249,28 @@ envsubst < ./webhost/config-template.json > ./webhost/config.json
 envsubst < ./api/config-template.json     > ./api/config.json
 
 #
-# Update the reverse proxy configuration with runtime values, including the cookie encryption key
+# Update the API routes with runtime values, including the cookie encryption key
 #
-cd reverse-proxy
-if [ "$REVERSE_PROXY_PROFILE" == 'NGINX' ]; then
+cd api-gateway
+if [ "$OAUTH_PROXY" == 'KONG' ]; then
 
-  # Use NGINX if specified on the command line
+  envsubst < ./kong/kong-template.yml > ./kong/kong.yml
+
+elif [ "$OAUTH_PROXY" == 'NGINX' ]; then
+
   envsubst < "./nginx/$NGINX_TEMPLATE_FILE_NAME" | sed -e 's/§/$/g' > ./nginx/default.conf
 
-elif [ "$REVERSE_PROXY_PROFILE" == 'OPENRESTY' ]; then
+elif [ "$OAUTH_PROXY" == 'OPENRESTY' ]; then
 
-  # Use OpenResty if specified on the command line
   envsubst < "./openresty/$NGINX_TEMPLATE_FILE_NAME" > ./openresty/default.conf
-
-else
-  
-  # Use Kong otherwise
-  envsubst < ./kong/kong-template.yml > ./kong/kong.yml
 fi
 cd ../..
 
 #
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
-echo "Deploying resources for the $SCENARIO scenario using $REVERSE_PROXY_PROFILE reverse proxy ..."
 docker compose --project-name spa down
-docker compose --file $DOCKER_COMPOSE_FILE --profile $IDSVR_PROFILE --profile $REVERSE_PROXY_PROFILE --project-name spa up --detach
+docker compose --file $DOCKER_COMPOSE_FILE --profile $IDSVR_PROFILE --profile $OAUTH_PROXY --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1
@@ -271,7 +279,6 @@ fi
 #
 # Configure Identity Server certificates when deploying the financial grade scenario
 #
-if [ "$SCENARIO" == 'financial' ]; then
+if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   ./deploy-idsvr-certs.sh
 fi
-

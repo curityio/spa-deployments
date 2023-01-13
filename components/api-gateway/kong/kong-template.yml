@@ -4,7 +4,7 @@ _transform: true
 services:
 
 #
-# In same domain setups the web static content and token handler components can be hosted together behind the reverse proxy
+# In same domain setups the web static content and token handler components can be hosted together behind the API gateway
 #
 - name: webhost
   url: $SCHEME://webhost-$INTERNAL_DOMAIN:3000
