@@ -65,7 +65,6 @@ if [ "$OAUTH_AGENT" != 'NODE' ] && [ "$OAUTH_AGENT" != 'NET' ] && [ "$OAUTH_AGEN
   echo 'An invalid value was supplied for the OAUTH_AGENT parameter'
   exit 1
 fi
-echo "Building resources for the $OAUTH_AGENT OAuth agent ..."
 
 #
 # Get the API gateway and OAuth proxy plugin to use, and default to Kong
@@ -78,7 +77,7 @@ if [ "$OAUTH_PROXY" != 'KONG' ] && [ "$OAUTH_PROXY" != 'NGINX' ] && [ "$OAUTH_PR
   echo 'An invalid value was supplied for the OAUTH_PROXY parameter'
   exit 1
 fi
-echo "Building resources for the $OAUTH_PROXY API gateway and plugin ..."
+echo "Deploying resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API gateway and plugin ..."
 
 #
 # Set some properties differently for the more complex financial grade setup

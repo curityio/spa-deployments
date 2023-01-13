@@ -21,7 +21,6 @@ if [ "$OAUTH_AGENT" != 'NODE' ] && [ "$OAUTH_AGENT" != 'NET' ] && [ "$OAUTH_AGEN
   echo 'An invalid value was supplied for the OAUTH_AGENT parameter'
   exit 1
 fi
-echo "Building resources for the $OAUTH_AGENT OAuth agent ..."
 
 #
 # Get the API gateway and OAuth proxy plugin to use, and default to Kong
@@ -34,7 +33,7 @@ if [ "$OAUTH_PROXY" != 'KONG' ] && [ "$OAUTH_PROXY" != 'NGINX' ] && [ "$OAUTH_PR
   echo 'An invalid value was supplied for the OAUTH_PROXY parameter'
   exit 1
 fi
-echo "Building resources for the $OAUTH_PROXY API gateway and plugin ..."
+echo "Building resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API gateway and plugin ..."
 
 #
 # Build the API gateway's custom dockerfile, which includes the OAuth proxy plugin
@@ -129,7 +128,6 @@ elif [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
     exit 1
   fi
   cd oauth-agent
-  git checkout feature/pme-778-behaviors
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
