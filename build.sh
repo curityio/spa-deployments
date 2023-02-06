@@ -55,7 +55,7 @@ elif [ "$OAUTH_PROXY" == 'OPENRESTY' ]; then
     exit 1
   fi
 
-elif [ "$OAUTH_AGENT" == 'KONG' ]; then
+elif [ "$OAUTH_PROXY" == 'KONG' ]; then
   
   docker build --no-cache -f kong/Dockerfile -t custom_kong:3.0.0 .
   if [ $? -ne 0 ]; then
