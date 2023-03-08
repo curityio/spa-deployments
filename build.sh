@@ -41,7 +41,7 @@ echo "Building resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API g
 cd components/api-gateway
 if [ "$OAUTH_PROXY" == 'NGINX' ]; then
 
-  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.21.6-alpine .
+  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.23.2-alpine .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the NGINX docker image"
     exit 1
@@ -57,7 +57,7 @@ elif [ "$OAUTH_PROXY" == 'OPENRESTY' ]; then
 
 elif [ "$OAUTH_PROXY" == 'KONG' ]; then
   
-  docker build --no-cache -f kong/Dockerfile -t custom_kong:3.0.0 .
+  docker build --no-cache -f kong/Dockerfile -t custom_kong:3.1.1 .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the Kong docker image"
     exit 1
