@@ -76,7 +76,7 @@ services:
   # The API gateway routes to the OAuth Agent and the business API inside the cluster
   #
   kong-api-gateway:
-    image: custom_kong:3.1.1
+    image: custom_kong:3.3.0
     hostname: apigateway
     ports:
       - 443:3000
@@ -135,7 +135,7 @@ services:
   # A SQL database used by the Curity Identity Server
   #
   curity-data:
-    image: postgres:13.2
+    image: postgres:15.3
     hostname: dbserver
     volumes:
       - ./components/idsvr/data-backup.sql:/docker-entrypoint-initdb.d/data-backup.sql
