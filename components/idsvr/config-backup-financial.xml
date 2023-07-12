@@ -310,6 +310,7 @@
                   <trusted-ca>financial_grade_client_ca</trusted-ca>
                 </mutual-tls>
                 <redirect-uris>https://#{WEB_DOMAIN}/</redirect-uris>
+                <audience>api.example.com</audience>
                 <scope>openid</scope>
                 <scope>profile</scope>
                 <user-authentication>
