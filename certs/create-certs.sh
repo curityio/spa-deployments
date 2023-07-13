@@ -139,7 +139,7 @@ openssl pkcs12 \
 # https://github.com/nodejs/node/issues/40672
 #
 openssl pkcs12 \
-    -certpbe AES-256-CBC \
+    -certpbe aes-256-ces \
     -export -inkey $TRUSTSTORE_FILE_PREFIX.key \
     -in $TRUSTSTORE_FILE_PREFIX.pem \
     -name $TRUSTSTORE_FILE_PREFIX \
