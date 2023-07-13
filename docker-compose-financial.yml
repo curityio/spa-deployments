@@ -66,10 +66,6 @@ services:
       COOKIE_NAME_PREFIX: 'example'
       COOKIE_ENCRYPTION_KEY: "${ENCRYPTION_KEY}"
       CORS_ENABLED: '${CORS_ENABLED}'
-    command: >
-      sh -c "keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
-             su 10001 &&
-             java -jar /usr/api/oauth-agent-0.0.1-SNAPSHOT.jar"
 
   #
   # The Kong API gateway exposes API endpoints to the browser at https://api.example.com:3000
