@@ -107,7 +107,7 @@ elif [ "$OAUTH_AGENT" == 'NET' ]; then
   #
   # TODO: delete after merge
   #
-  git checkout feature/maintenance-updates
+  git checkout feature/maintenance_updates
 
   dotnet publish oauth-agent.csproj -c Release -r linux-x64 --no-self-contained
   if [ $? -ne 0 ]; then
