@@ -127,7 +127,7 @@ elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
   #
   # TODO: delete after merge
   #
-  git checkout feature/maintenance_updates
+  git checkout feature/dependency_updates
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
