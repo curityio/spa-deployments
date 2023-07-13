@@ -124,6 +124,11 @@ elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
   fi
   cd oauth-agent
 
+  #
+  # TODO: delete after merge
+  #
+  git checkout feature/maintenance_updates
+
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OAuth Agent's Kotlin code"
@@ -138,6 +143,11 @@ elif [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
     exit 1
   fi
   cd oauth-agent
+
+  #
+  # TODO: delete after merge
+  #
+  git checkout feature/maintenance_updates
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
