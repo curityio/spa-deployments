@@ -68,6 +68,7 @@ services:
       CORS_ENABLED: '${CORS_ENABLED}'
     command: >
       sh -c "keytool -import -alias example.ca -cacerts -file /usr/api/certs/example.ca.pem -storepass changeit -noprompt &&
+             su apiuser &&
              java -jar /usr/api/oauth-agent-0.0.1-SNAPSHOT.jar"
 
   #
