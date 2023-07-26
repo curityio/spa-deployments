@@ -57,7 +57,7 @@ elif [ "$OAUTH_PROXY" == 'OPENRESTY' ]; then
 
 elif [ "$OAUTH_PROXY" == 'KONG' ]; then
   
-  docker build --no-cache -f kong/Dockerfile -t custom_kong:3.1.1 .
+  docker build --no-cache -f kong/Dockerfile -t custom_kong:3.3.0 .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the Kong docker image"
     exit 1

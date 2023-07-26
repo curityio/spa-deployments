@@ -300,6 +300,8 @@
                 <description>SPA that uses a Back End for Front End API</description>
                 <secret>$5$TCfYst/ysngW7RbV$rMLasvlJpnQ0wmFoeTrdIHPjVdnsqOVelkqawZ.fZ17</secret>
                 <redirect-uris>http://#{WEB_DOMAIN}/</redirect-uris>
+                <audience>spa-client</audience>
+                <audience>api.example.com</audience>
                 <scope>openid</scope>
                 <scope>profile</scope>
                 <user-authentication>
