@@ -78,11 +78,6 @@ if [ "$OAUTH_AGENT" == 'NODE' ]; then
   fi
   cd oauth-agent
 
-  #
-  # TODO: delete after merge
-  #
-  git checkout feature/maintenance-updates
-
   npm install
   if [ $? -ne 0 ]; then
     echo "Problem encountered installing the OAuth Agent dependencies"
@@ -104,11 +99,6 @@ elif [ "$OAUTH_AGENT" == 'NET' ]; then
   fi
   cd oauth-agent
 
-  #
-  # TODO: delete after merge
-  #
-  git checkout feature/maintenance_updates
-
   dotnet publish oauth-agent.csproj -c Release -r linux-x64 --no-self-contained
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OAuth Agent's Java code"
@@ -124,11 +114,6 @@ elif [ "$OAUTH_AGENT" == 'KOTLIN' ]; then
   fi
   cd oauth-agent
 
-  #
-  # TODO: delete after merge
-  #
-  git checkout feature/dependency_updates
-
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the OAuth Agent's Kotlin code"
@@ -143,11 +128,6 @@ elif [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
     exit 1
   fi
   cd oauth-agent
-
-  #
-  # TODO: delete after merge
-  #
-  git checkout feature/dependency_updates
 
   ./gradlew bootJar
   if [ $? -ne 0 ]; then
