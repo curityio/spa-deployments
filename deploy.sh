@@ -186,13 +186,21 @@ else
 fi
 
 #
-# In development mode the web host runs locally on port 80 or 443, so use a different gateway port
+# The web host and static content are deployed to Docker containers by default
+#
+WEBHOST_PROFILE='WITH_WEBHOST'
+
+#
+# In development mode, the web host and static content run locally instead
+# In this case we continue to use port 80 or 443 for the SPA and the gateway uses a different port
 #
 if [ "$DEVELOPMENT" == 'true' ]; then
   WEBHOST_PROFILE='WITHOUT_WEBHOST'
-  GATEWAY_PORT=3000
-else
-  WEBHOST_PROFILE='WITH_WEBHOST'
+  if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
+    GATEWAY_PORT=444
+  else
+    GATEWAY_PORT=81
+  fi
 fi
 
 #
@@ -204,7 +212,7 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 # Disable CORS when web content and token handler are hosted in the same domain
 #
-if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
+if [ "$WEB_DOMAIN" == "$API_DOMAINGA" ]; then
   CORS_ENABLED='false'
   CORS_ENABLED_NGINX='off'
 else
