@@ -194,7 +194,7 @@ echo -n $ENCRYPTION_KEY > encryption.key
 #
 # Disable CORS when web content and token handler are hosted in the same domain
 #
-if [ "$WEB_DOMAIN" == "$API_DOMAINGA" ]; then
+if [ "$WEB_DOMAIN" == "$API_DOMAIN" ]; then
   CORS_ENABLED='false'
   CORS_ENABLED_NGINX='off'
 else
