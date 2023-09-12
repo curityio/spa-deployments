@@ -211,14 +211,14 @@ if [ "$DEVELOPMENT" == 'true' ]; then
   # In development mode, the web host and static content run locally instead
   WEBHOST_PROFILE='WITHOUT_WEBHOST'
 
-  # In this case we continue to use port 80 or 443 for the SPA and the gateway uses a different port
+  # In this case we continue to use port 80 or 443 for the SPA, and the gateway uses a different port
   if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
     GATEWAY_PORT=444
   else
     GATEWAY_PORT=81
   fi
 
-  # Since the web host uses a different port to the token handler, CORS is required
+  # Since the web host uses a different port to the gateway, CORS is required
   CORS_ENABLED='true'
   CORS_ENABLED_NGINX='on'
 fi
