@@ -186,10 +186,11 @@ else
 fi
 
 #
-# In development mode the web host is not deployed
+# In development mode the web host runs locally on port 80 or 443, so use a different gateway port
 #
 if [ "$DEVELOPMENT" == 'true' ]; then
   WEBHOST_PROFILE='WITHOUT_WEBHOST'
+  GATEWAY_PORT=3000
 else
   WEBHOST_PROFILE='WITH_WEBHOST'
 fi
