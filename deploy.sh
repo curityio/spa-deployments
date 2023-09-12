@@ -186,24 +186,6 @@ else
 fi
 
 #
-# The web host and static content are deployed to Docker containers by default
-#
-WEBHOST_PROFILE='WITH_WEBHOST'
-
-#
-# In development mode, the web host and static content run locally instead
-# In this case we continue to use port 80 or 443 for the SPA and the gateway uses a different port
-#
-if [ "$DEVELOPMENT" == 'true' ]; then
-  WEBHOST_PROFILE='WITHOUT_WEBHOST'
-  if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
-    GATEWAY_PORT=444
-  else
-    GATEWAY_PORT=81
-  fi
-fi
-
-#
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #
 ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
@@ -216,6 +198,27 @@ if [ "$WEB_DOMAIN" == "$API_DOMAINGA" ]; then
   CORS_ENABLED='false'
   CORS_ENABLED_NGINX='off'
 else
+  CORS_ENABLED='true'
+  CORS_ENABLED_NGINX='on'
+fi
+
+#
+# The web host and static content are deployed to Docker containers by default
+#
+WEBHOST_PROFILE='WITH_WEBHOST'
+if [ "$DEVELOPMENT" == 'true' ]; then
+  
+  # In development mode, the web host and static content run locally instead
+  WEBHOST_PROFILE='WITHOUT_WEBHOST'
+
+  # In this case we continue to use port 80 or 443 for the SPA and the gateway uses a different port
+  if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
+    GATEWAY_PORT=444
+  else
+    GATEWAY_PORT=81
+  fi
+
+  # Since the web host uses a different port to the token handler, CORS is required
   CORS_ENABLED='true'
   CORS_ENABLED_NGINX='on'
 fi
