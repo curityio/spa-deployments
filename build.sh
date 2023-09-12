@@ -1,8 +1,8 @@
 #!/bin/bash
 
-###########################################
-# A script to build Token Handler resources
-###########################################
+###############################################################################
+# A script to build resources of the end to end solution into Docker containers
+###############################################################################
 
 #
 # Ensure that we are in the folder containing this script

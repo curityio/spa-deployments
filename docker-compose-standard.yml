@@ -12,11 +12,13 @@ services:
       - ./components/spa/config.json:/usr/webhost/content/config.json
     environment:
       NODE_ENV: 'production'
+    profiles:
+      - WITH_WEBHOST
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
   # It runs on port 3002 inside the cluster at http://api.internal-example.com:3002
-  # The SPA accesses it via the API gateway at http://api.example.com:3000/api
+  # The SPA accesses it via the API gateway at http://api.example.com/api
   #
   business-api:
     image: business-api:1.0.0
@@ -27,7 +29,7 @@ services:
   #
   # An OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
   # It runs on port 3001 inside the cluster at http://oauthagent.internal-example.com:3001
-  # The SPA accesses it via the API gateway at http://api.example.com:3000/oauth-agent
+  # The SPA accesses it via the API gateway at http://api.example.com/oauth-agent
   #
   oauth-agent:
     image: oauthagent:1.0.0
@@ -59,7 +61,7 @@ services:
     image: custom_kong:3.3.0
     hostname: apigateway
     ports:
-      - 80:3000
+      - ${GATEWAY_PORT}:3000
     volumes:
       - ./components/api-gateway/kong/kong.yml:/usr/local/kong/declarative/kong.yml
     environment:

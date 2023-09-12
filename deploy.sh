@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ########################################################################
-# A script to deploy Token Handler resources in a Docker compose network 
+# A script to deploy Token Handler resources in a Docker compose network
+# A number of deployment variations are supported by this script
 ########################################################################
 
 #
@@ -85,12 +86,14 @@ echo "Deploying resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API 
 if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   DOCKER_COMPOSE_FILE='docker-compose-financial.yml'
   SCHEME='https'
+  GATEWAY_PORT=443
   SSL_CERT_FILE_PATH='./certs/example.server.p12'
   SSL_CERT_PASSWORD='Password1'
   NGINX_TEMPLATE_FILE_NAME='default.conf.financial.template'
 else
   DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
   SCHEME='http'
+  GATEWAY_PORT=80
   SSL_CERT_FILE_PATH=''
   SSL_CERT_PASSWORD=''
   NGINX_TEMPLATE_FILE_NAME='default.conf.standard.template'
@@ -183,6 +186,15 @@ else
 fi
 
 #
+# In development mode the web host is not deployed
+#
+if [ "$DEVELOPMENT" == 'true' ]; then
+  WEBHOST_PROFILE='WITHOUT_WEBHOST'
+else
+  WEBHOST_PROFILE='WITH_WEBHOST'
+fi
+
+#
 # Supply the 32 byte encryption key for AES256 as an environment variable
 #
 ENCRYPTION_KEY=$(openssl rand 32 | xxd -p -c 64)
@@ -202,6 +214,7 @@ fi
 #
 # Export variables needed for substitution and deployment
 #
+export GATEWAY_PORT
 export SCHEME
 export BASE_DOMAIN
 export WEB_DOMAIN
@@ -270,7 +283,7 @@ cd ../..
 # Spin up all containers, using the Docker Compose file, which applies the deployed configuration
 #
 docker compose --project-name spa down
-docker compose --file $DOCKER_COMPOSE_FILE --profile $IDSVR_PROFILE --profile $OAUTH_PROXY --project-name spa up --detach
+docker compose --file $DOCKER_COMPOSE_FILE --profile $WEBHOST_PROFILE --profile $IDSVR_PROFILE --profile $OAUTH_PROXY --project-name spa up --detach
 if [ $? -ne 0 ]; then
   echo "Problem encountered starting Docker components"
   exit 1

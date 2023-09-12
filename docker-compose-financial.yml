@@ -13,11 +13,13 @@ services:
       - ./certs/example.server.p12:/usr/webhost/certs/example.server.p12
     environment:
       NODE_ENV: 'production'
+    profiles:
+      - WITH_WEBHOST
 
   #
   # Deploy the example business API, which is a simple API that just validates JWTs
   # It runs on port 3002 inside the cluster at https://api.internal-example.com:3002
-  # The SPA accesses it via the API gateway at https://api.example.com:3000/api
+  # The SPA accesses it via the API gateway at https://api.example.com/api
   # The API calls the Authorization Server's JWKS endpoint inside the cluster
   #
   business-api:
@@ -33,7 +35,7 @@ services:
   #
   # The OAuth Agent provided by Curity is hosted here, to perform the OpenID Connect work
   # It runs on port 3001 inside the cluster at https://oauthagent.internal-example.com:3001
-  # The SPA accesses it via the API gateway at https://api.example.com:3000/oauth-agent
+  # The SPA accesses it via the API gateway at https://api.example.com/oauth-agent
   # The OAuth Agent calls the Authorization Server's token endpoint inside the cluster
   #
   oauth-agent:
@@ -72,14 +74,14 @@ services:
              java -jar /usr/api/oauth-agent-0.0.1-SNAPSHOT.jar"
 
   #
-  # The Kong API gateway exposes API endpoints to the browser at https://api.example.com:3000
+  # The Kong API gateway exposes API endpoints to the browser at https://api.example.com
   # The API gateway routes to the OAuth Agent and the business API inside the cluster
   #
   kong-api-gateway:
     image: custom_kong:3.3.0
     hostname: apigateway
     ports:
-      - 443:3000
+      - ${GATEWAY_PORT}:3000
     volumes:
       - ./components/api-gateway/kong/kong.yml:/usr/local/kong/declarative/kong.yml
       - ./certs/example.ca.pem:/usr/local/share/certs/example.ca.pem
