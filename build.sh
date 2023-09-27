@@ -41,7 +41,7 @@ echo "Building resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API g
 cd components/api-gateway
 if [ "$OAUTH_PROXY" == 'NGINX' ]; then
 
-  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.23.2-alpine .
+  docker build --no-cache -f nginx/Dockerfile -t custom_nginx:1.25.1-alpine .
   if [ $? -ne 0 ]; then
     echo "Problem encountered building the NGINX docker image"
     exit 1
