@@ -76,7 +76,7 @@ services:
   # The API gateway routes to the OAuth Agent and the business API inside the cluster
   #
   kong-api-gateway:
-    image: custom_kong:3.3.0
+    image: custom_kong:3.4.0
     hostname: apigateway
     ports:
       - 443:3000
@@ -119,7 +119,7 @@ services:
   # Use OpenResty and LUA plugins
   #
   openresty-api-gateway:
-    image: custom_openresty/openresty:1.21.4.1-bionic
+    image: custom_openresty/openresty:1.21.4.1-jammy
     hostname: apigateway
     ports:
       - 443:3000
