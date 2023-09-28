@@ -1,4 +1,4 @@
-FROM openresty/openresty:1.21.4.1-bionic
+FROM openresty/openresty:1.21.4.1-jammy
 
 # Fetch from luarocks, and set git options if required
 RUN apt-get update && apt-get install git -y

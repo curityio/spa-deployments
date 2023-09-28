@@ -56,7 +56,7 @@ services:
   # Use Kong and LUA plugins
   #
   kong-api-gateway:
-    image: custom_kong:3.3.0
+    image: custom_kong:3.4.0
     hostname: apigateway
     ports:
       - 80:3000
@@ -76,7 +76,7 @@ services:
   # Use NGINX and C modules
   #
   nginx-api-gateway:
-    image: custom_nginx:1.23.2-alpine
+    image: custom_nginx:1.25.1-alpine
     hostname: apigateway
     ports:
       - 80:3000
@@ -90,7 +90,7 @@ services:
   # Use OpenResty and LUA plugins
   #
   openresty-api-gateway:
-    image: custom_openresty/openresty:1.21.4.1-bionic
+    image: custom_openresty/openresty:1.21.4.1-jammy
     hostname: apigateway
     ports:
       - 80:3000
