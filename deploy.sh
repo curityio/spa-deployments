@@ -86,12 +86,14 @@ echo "Deploying resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API 
 if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   DOCKER_COMPOSE_FILE='docker-compose-financial.yml'
   SCHEME='https'
+  GATEWAY_PORT='443'
   SSL_CERT_FILE_PATH='./certs/example.server.p12'
   SSL_CERT_PASSWORD='Password1'
   NGINX_TEMPLATE_FILE_NAME='default.conf.financial.template'
 else
   DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
   SCHEME='http'
+  GATEWAY_PORT='80'
   SSL_CERT_FILE_PATH=''
   SSL_CERT_PASSWORD=''
   NGINX_TEMPLATE_FILE_NAME='default.conf.standard.template'
@@ -201,11 +203,13 @@ else
 fi
 
 #
-# If the SPA is running in development mode, then avoid deploying the web host and always use CORS
+# If the SPA is running in development mode, it uses the webpack dev server on port 80
+# In this case, avoid deploying the web host, use port 3000 and activate CORS
 #
 WEBHOST_PROFILE='WITH_WEBHOST'
 if [ "$DEVELOPMENT" == 'true' ]; then
   WEBHOST_PROFILE='WITHOUT_WEBHOST'
+  GATEWAY_PORT='3000'
   CORS_ENABLED='true'
   CORS_ENABLED_NGINX='on'
 fi
@@ -213,6 +217,7 @@ fi
 #
 # Export variables needed for substitution and deployment
 #
+export GATEWAY_PORT
 export SCHEME
 export BASE_DOMAIN
 export WEB_DOMAIN
