@@ -278,7 +278,7 @@ elif [ "$OAUTH_PROXY" == 'NGINX' ]; then
 
 elif [ "$OAUTH_PROXY" == 'OPENRESTY' ]; then
 
-  envsubst < "./openresty/$NGINX_TEMPLATE_FILE_NAME" > ./openresty/default.conf
+  envsubst < "./openresty/$NGINX_TEMPLATE_FILE_NAME" | sed -e 's/§/$/g' > ./openresty/default.conf
 fi
 cd ../..
 
