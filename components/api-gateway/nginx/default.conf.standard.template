@@ -13,8 +13,9 @@ server {
         # Use the Docker embedded DNS server
         resolver 127.0.0.11;
         
-        # Route directly to web static content
-        proxy_pass $SCHEME://webhost-$INTERNAL_DOMAIN:3000/;
+        # Route directly to web static content, and the variable avoids crashes when we do not deploy the web host
+        set §webhost_location http://webhost-internal.example.com:3000/;
+        proxy_pass §webhost_location;
     }
 
     location /oauth-agent {
