@@ -86,14 +86,12 @@ echo "Deploying resources for the $OAUTH_AGENT OAuth agent and $OAUTH_PROXY API 
 if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
   DOCKER_COMPOSE_FILE='docker-compose-financial.yml'
   SCHEME='https'
-  GATEWAY_PORT=443
   SSL_CERT_FILE_PATH='./certs/example.server.p12'
   SSL_CERT_PASSWORD='Password1'
   NGINX_TEMPLATE_FILE_NAME='default.conf.financial.template'
 else
   DOCKER_COMPOSE_FILE='docker-compose-standard.yml'
   SCHEME='http'
-  GATEWAY_PORT=80
   SSL_CERT_FILE_PATH=''
   SSL_CERT_PASSWORD=''
   NGINX_TEMPLATE_FILE_NAME='default.conf.standard.template'
@@ -203,22 +201,11 @@ else
 fi
 
 #
-# The web host and static content are deployed to Docker containers by default
+# If the SPA is running in development mode, then avoid deploying the web host and always use CORS
 #
 WEBHOST_PROFILE='WITH_WEBHOST'
 if [ "$DEVELOPMENT" == 'true' ]; then
-  
-  # In development mode, the web host and static content run locally instead
   WEBHOST_PROFILE='WITHOUT_WEBHOST'
-
-  # In this case we continue to use port 80 or 443 for the SPA, and the gateway uses a different port
-  if [ "$OAUTH_AGENT" == 'FINANCIAL' ]; then
-    GATEWAY_PORT=444
-  else
-    GATEWAY_PORT=81
-  fi
-
-  # Since the web host uses a different port to the gateway, CORS is required
   CORS_ENABLED='true'
   CORS_ENABLED_NGINX='on'
 fi
@@ -226,7 +213,6 @@ fi
 #
 # Export variables needed for substitution and deployment
 #
-export GATEWAY_PORT
 export SCHEME
 export BASE_DOMAIN
 export WEB_DOMAIN
