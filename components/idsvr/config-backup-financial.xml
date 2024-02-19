@@ -392,6 +392,8 @@
         <id>default-datasource</id>
         <jdbc xmlns="https://curity.se/ns/ext-conf/jdbc">
           <connection-string>jdbc:postgresql://dbserver/idsvr</connection-string>
+          <standard-credentials-mode>
+          </standard-credentials-mode>
           <driver>org.postgresql.Driver</driver>
           <password>Password1</password>
           <use-for-audit>true</use-for-audit>
